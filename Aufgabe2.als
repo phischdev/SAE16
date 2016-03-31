@@ -30,10 +30,11 @@ sig MainFunction extends Function{
 
 }
 
-
 fact belongsToFunction{
 	all f: Function | all l:LinearProgram | f.belongsToOneLinPr = l <=> l.function = f
 }
+
+
 
 -------------------------Parameter--------------------------------
 
@@ -159,13 +160,6 @@ fact parentAndChildHasTheSameExprTree {
 }
 
 
-
-
-
-
-
-
-
 -------------------------------Variable-----------------------------------------
 
 sig Variable {
@@ -178,15 +172,12 @@ sig Variable {
 
 sig DeclaredVariable {
 	type: one Type,
-	readIn: some Expr,
 	belongsTo: one Variable
 	
 }
 
 sig AssignedVariable extends DeclaredVariable {
-	type: one Type,
 	readIn: some Expr,
-	belongsTo: one Variable
 }
 
 
@@ -198,8 +189,7 @@ sig VarDecl extends Statement{
 
 fact variablelist{
 	(all d: DeclaredVariable | all v: Variable | d in v.declaredVariables <=> d.belongsTo = v) &&
-	(all p: FormalParameter | all v: Variable | p in v.formalParameters  <=> p.belongsToOneVariable = v) &&
-	(all a: AssignedVariable| all v: Variable | a in v.assignedVariables  <=> a.belongsTo = v) 
+	(all p: FormalParameter | all v: Variable | p in v.formalParameters  <=> p.belongsToOneVariable = v) 
 }
 
 
