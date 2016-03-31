@@ -71,10 +71,13 @@ sig LinearSequenceOfStatement {
 
 abstract sig Statement {
 	nextStatement: lone Statement,
-	expressions: lone Expr
+	expressions: some Expr
+    
 }
 
 sig AssignementStatement  extends Statement{
+	variable: one DeclaredVariable,
+	expressions: one Expr
 }
 
 sig ReturnStatement extends Statement{
@@ -219,6 +222,8 @@ fact variablelist{
 
 
 
+
+
 //----------------------Functions--------------------------------
 
 
@@ -244,10 +249,15 @@ fun p_parameters[f:Function]:set FormalParameter {
 */
 
 
+-- Predicates --------------
 
 pred p_ContainsCall [f: Function] {
    # {x: Expr | x in ( f.sequence.firstStatement.^nextStatement ).expressions} > 0
 }
+
+
+
+
 
 
 
