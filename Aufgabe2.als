@@ -51,7 +51,7 @@ fact reflexitivFormalParameter{
 sig LinearSequenceOfStatement {
 	belongsTo: one Function,
 	firstStatement: one Statement,
-	lastStatement: one ReturnStatement,
+	returnStatements: some ReturnStatement,
 	statements: some Statement
 }
 
@@ -156,37 +156,30 @@ fact parentAndChildHasTheSameExprTree {
 
 sig Variable {
 	declaredVariables: set DeclaredVariable,
-	formalParameter: set FormalParameter
+	formalParameters: set FormalParameter
 }
 
-sig NotDeclaredVariable {
-	declaredIn: one VarDecl
-}
 
 sig DeclaredVariable {
 	type: one Type,
 	readIn: some Expr
 }
 
-sig AssignedVariable {
+sig AssignedVariable extends {
 	type: one Type,
 	readIn: Expr
 }
 
 
 sig VarDecl extends Statement{
-	variable: one NotDeclaredVariable,
 	type: one Type
 } // in UML we call it DeclarationStatement
 
 
 
-fact oneDeclarationStatementPerVariable{
-	all v: NotDeclaredVariable |all d: VarDecl | v.declaredIn = d <=> d.variable = v
-}
-
 fact variable{
-	all d: DeclaredVariable | all v: Variable | d in v.declaredVariables
+	(all d: DeclaredVariable | all v: Variable | d in v.declaredVariables) &&
+	(all p: FormalParameter | all v: Variable | p in v.formalParameters)
 }
 
 
