@@ -42,7 +42,7 @@ abstract sig Parameter {
 }
 
 sig FormalParameter extends Parameter {
-	belongsTo: one Function
+	belongsTo: one Function,
 	belongsToOneVariable: one Variable
 }
 
@@ -184,7 +184,7 @@ sig DeclaredVariable {
 	
 }
 
-sig AssignedVariable{
+sig AssignedVariable extends DeclaredVariable {
 	type: one Type,
 	readIn: some Expr,
 	belongsTo: one Variable
@@ -199,8 +199,8 @@ sig VarDecl extends Statement{
 
 fact variablelist{
 	(all d: DeclaredVariable | all v: Variable | d in v.declaredVariables <=> d.belongsTo = v) &&
-	(all p: FormalParameter | all v: Variable | p in v.formalParameters  <=> p.belongsToOneVariable = v)) &&
-	(all a: AssignedVariable| all v: Variable | a in v.assignedVariables  <=> a.belongsTo = v)) 
+	(all p: FormalParameter | all v: Variable | p in v.formalParameters  <=> p.belongsToOneVariable = v) &&
+	(all a: AssignedVariable| all v: Variable | a in v.assignedVariables  <=> a.belongsTo = v) 
 }
 
 
@@ -256,4 +256,4 @@ fun p_parameters[f:Function]:set FormalParameter {
 
 pred show {}
 
-run show for 5
+run show for 10
