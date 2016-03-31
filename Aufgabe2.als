@@ -38,6 +38,7 @@ fact belongsToFunction{
 
 
 fact avoidRecursion{
+	f: Func
 	
 }
 
@@ -74,7 +75,6 @@ abstract sig Statement {
 }
 
 sig AssignementStatement  extends Statement{
-	variable: one DeclaredVariable
 }
 
 sig ReturnStatement extends Statement{
@@ -205,6 +205,20 @@ fact variablelist{
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //----------------------Functions--------------------------------
 
 
@@ -229,7 +243,7 @@ fun p_parameters[f:Function]:set FormalParameter {
 
 */
 
--- Predicates --
+
 
 pred p_ContainsCall [f: Function] {
    # {x: Expr | x in ( f.sequence.firstStatement.^nextStatement ).expressions} > 0
@@ -240,8 +254,4 @@ pred p_ContainsCall [f: Function] {
 
 pred show {}
 
-<<<<<<< HEAD
-run show for 1
-=======
 run show for 3
->>>>>>> 46bedbeaa28a24a7be51777b605de7ffd933598a
