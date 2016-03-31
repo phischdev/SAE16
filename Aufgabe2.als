@@ -23,7 +23,8 @@ sig Function {
 	returnValue: one ReturnStatement,
 	formalParameter: set FormalParameter,
 	belongsToOneLinPr: one LinearProgram, 
-	returnStatements: some ReturnStatement
+	returnStatements: some ReturnStatement,
+	sequence: one  LinearSequenceOfStatement
 }
 
 sig MainFunction extends Function{
@@ -35,7 +36,9 @@ fact belongsToFunction{
 }
 
 
-
+fact avoidRecursion{
+	
+}
 -------------------------Parameter--------------------------------
 
 abstract sig Parameter {
@@ -49,11 +52,12 @@ sig FormalParameter extends Parameter {
 
 sig ActualParameter extends Parameter {}
 
-
+/*
 fact reflexitivFormalParameter{
 	all f: Function | all p: FormalParameter | f.formalParameter = p <=> p.belongsTo = f
 }
 
+*/
 --------------------------Statement-----------------------------
 
 sig LinearSequenceOfStatement {
@@ -77,6 +81,7 @@ sig ReturnStatement {
 	isIn: one LinearSequenceOfStatement
 }
 
+/*
 fact returnStatementBelongsToOneFunction {
 	all f: Function | all r: ReturnStatement| r. belongsTo = f <=> r in f.returnStatements
 }
@@ -101,7 +106,7 @@ fact differentNextStatement {
 	all s1, s2, s3: Statement | s1.nextStatement = s2 => s3.nextStatement != s2
 }
 
-
+*/
 ------------------------------------------------------------------
 
 sig Expr {
