@@ -238,9 +238,20 @@
 		%----------------------------------------------------------------------------------------
 		%	Aufgabe S1
 		%----------------------------------------------------------------------------------------
-		
+		\begin{homeworkProblem}[Task A.]
+			What we cannot express in UML\\
+			\begin{itemize}
+				\item
+				We cannot express that a Declared Variable is changed to a Assigned Variabe when assigned in an assignment statement.
+			\end{itemize}
+		\end{homeworkProblem}
 		\begin{homeworkProblem}[Task C.]
-			
+			\begin{enumerate}
+				\item A program with one function, 2 function calls
+				This cannot be achieved. A program with exactly one function contains only the main function. Since we don't allow recursion the main function cannot have a function call
+				\item A program with two functions, 2 function calls
+				This still cannot be achieved. Since we don't allow recursion the main function (\emph{Function A}) can only call \emph{Function B}. \emph{Function B} cannot call itself, so it has to call \emph{Function A}. But this would lead to indirect recursion which is still not allowed.
+			\end{enumerate}
 		\end{homeworkProblem}
 		
 	\end{document}
