@@ -250,14 +250,28 @@ fun p_parameters[f:Function]:set FormalParameter {
 -- Predicates --------------
 
 pred p_ContainsCall [f: Function] {
-   # {x: Expr | x in ( f.sequence.firstStatement.^nextStatement ).expressions} > 0
+  # {x: Expr | x in ( f.sequence.firstStatement.^nextStatement ).expressions} > 0
 }
 
+pred p_isAssigned [v: Variable] {
+  some f: Function | some s:AssignementStatement | s in f.sequence.statements && s.variable = v
+}
 
+pred p_isRead [v: Variable] {
+  some f: Function | some s:VariableReference | s in f.sequence.statement.expression && s.variable = v
+}
 
+pred p_isDeclared [v: Variable] {
+  some f: Function | some s:DeclarationStatemente | s in f.sequence.statements && s.variable = v
+}
 
+pred p_isSubtype [t1: Type, t2: Type] {
+  t1 in t2.^superType
+}
 
-
+pred p_assignsTo [s: Statement, vd: VariabledDeclaration] {
+  s.variable = vd.variable
+}
 
 
 pred show {}
