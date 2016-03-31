@@ -22,16 +22,14 @@ sig Function {
 	returnType: one Type, 
 	returnValue: one ReturnStatement,
 	formalParameter: set FormalParameter,
-	belongsToOneLinPr: one LinearProgram
+	belongsToOneLinPr: one LinearProgram, 
+	returnStatements: some ReturnStatement
 }
 
 sig MainFunction extends Function{
-	belongsTo: one LinearProgram
+
 }
 
-fact belongsToMainFunction{
-	all m: MainFunction | all l:LinearProgram | m.belongsTo = l <=> l.mainFunction = m
-}
 
 fact belongsToFunction{
 	all f: Function | all l:LinearProgram | f.belongsToOneLinPr = l <=> l.function = f
@@ -45,6 +43,7 @@ abstract sig Parameter {
 
 sig FormalParameter extends Parameter {
 	belongsTo: one Function
+	belongsToOneVariable: one Variable
 }
 
 sig ActualParameter extends Parameter {}
@@ -73,9 +72,17 @@ sig AssignementStatement  extends Statement{
 }
 
 sig ReturnStatement {
-	belongsTo: Function
+	belongsTo:  one Function,
+	isIn: one LinearSequenceOfStatement
 }
 
+fact returnStatementBelongsToOneFunction {
+	all f: Function | all r: ReturnStatement| r. belongsTo = f <=> r in f.returnStatements
+}
+
+fact isIn {
+	all  s: LinearSequenceOfStatement | all r: ReturnStatement | r.isIn = s <=> r in s.returnStatements
+}
 
 fact statement{
  	all s: LinearSequenceOfStatement |#s.statements = # s.firstStatement.^nextStatement
@@ -164,18 +171,23 @@ fact parentAndChildHasTheSameExprTree {
 
 sig Variable {
 	declaredVariables: set DeclaredVariable,
-	formalParameters: set FormalParameter
+	formalParameters: set FormalParameter, 
+	assignedVariables: set AssignedVariable,
+	belongsToOneFunction: one Function
 }
 
 
 sig DeclaredVariable {
 	type: one Type,
-	readIn: some Expr
+	readIn: some Expr,
+	belongsTo: one Variable
+	
 }
 
 sig AssignedVariable{
 	type: one Type,
-	readIn: Expr
+	readIn: some Expr,
+	belongsTo: one Variable
 }
 
 
@@ -185,10 +197,19 @@ sig VarDecl extends Statement{
 
 
 
-fact variable{
-	(all d: DeclaredVariable | all v: Variable | d in v.declaredVariables) &&
-	(all p: FormalParameter | all v: Variable | p in v.formalParameters)
+fact variablelist{
+	(all d: DeclaredVariable | all v: Variable | d in v.declaredVariables <=> d.belongsTo = v) &&
+	(all p: FormalParameter | all v: Variable | p in v.formalParameters  <=> p.belongsToOneVariable = v)) &&
+	(all a: AssignedVariable| all v: Variable | a in v.assignedVariables  <=> a.belongsTo = v)) 
 }
+
+
+
+
+
+
+
+
 
 
 
