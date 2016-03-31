@@ -6,7 +6,7 @@
 //---------------------------------------------------------------
 
 abstract sig LinearProgram{
-	function: set Function,
+	function: some Function,
 	mainFunction: one MainFunction
 }
 
@@ -21,13 +21,21 @@ sig Type {
 sig Function {
 	returnType: one Type, 
 	returnValue: one ReturnStatement,
-	formalParameter: set FormalParameter
+	formalParameter: set FormalParameter,
+	belongsToOneLinPr: one LinearProgram
 }
 
-sig MainFunction{
-	callExpression: some CallExpression
+sig MainFunction extends Function{
+	belongsTo: one LinearProgram
 }
 
+fact belongsToMainFunction{
+	all m: MainFunction | all l:LinearProgram | m.belongsTo = l <=> l.mainFunction = m
+}
+
+fact belongsToFunction{
+	all f: Function | all l:LinearProgram | f.belongsToOneLinPr = l <=> l.function = f
+}
 
 -------------------------Parameter--------------------------------
 
@@ -165,7 +173,7 @@ sig DeclaredVariable {
 	readIn: some Expr
 }
 
-sig AssignedVariable extends {
+sig AssignedVariable{
 	type: one Type,
 	readIn: Expr
 }
