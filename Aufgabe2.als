@@ -31,6 +31,7 @@ sig MainFunction extends Function{
 
 }
 
+
 fact belongsToFunction{
 	all f: Function | all l:LinearProgram | f.belongsToOneLinPr = l <=> l.function = f
 }
@@ -39,6 +40,7 @@ fact belongsToFunction{
 fact avoidRecursion{
 	
 }
+
 -------------------------Parameter--------------------------------
 
 abstract sig Parameter {
@@ -52,18 +54,17 @@ sig FormalParameter extends Parameter {
 
 sig ActualParameter extends Parameter {}
 
-/*
+
 fact reflexitivFormalParameter{
 	all f: Function | all p: FormalParameter | f.formalParameter = p <=> p.belongsTo = f
 }
 
-*/
+
 --------------------------Statement-----------------------------
 
 sig LinearSequenceOfStatement {
 	belongsTo: one Function,
 	firstStatement: one Statement,
-	returnStatements: some ReturnStatement,
 	statements: some Statement
 }
 
@@ -76,27 +77,31 @@ sig AssignementStatement  extends Statement{
 	variable: one DeclaredVariable
 }
 
-sig ReturnStatement {
+sig ReturnStatement extends Statement{
 	belongsTo:  one Function,
 	isIn: one LinearSequenceOfStatement
 }
 
-/*
+
+
 fact returnStatementBelongsToOneFunction {
 	all f: Function | all r: ReturnStatement| r. belongsTo = f <=> r in f.returnStatements
 }
 
-fact isIn {
-	all  s: LinearSequenceOfStatement | all r: ReturnStatement | r.isIn = s <=> r in s.returnStatements
-}
 
 fact statement{
- 	all s: LinearSequenceOfStatement |#s.statements = # s.firstStatement.^nextStatement
+ 	all s: LinearSequenceOfStatement |all x: Statement | x in s.statements <=> x in (s.firstStatement.^nextStatement + s.firstStatement)
+} 
+
+
+fact allStatementMustAppear{
+	all a: AssignementStatement |all s: LinearSequenceOfStatement  |a in s.statements
 }
 
 fact noCircle{
 	all s1, s2: Statement | s1.nextStatement = s2 => s1 not in s2.^nextStatement
 }
+
 
 fact noItSelf{
 	all s:Statement | s.nextStatement != s
@@ -106,7 +111,7 @@ fact differentNextStatement {
 	all s1, s2, s3: Statement | s1.nextStatement = s2 => s3.nextStatement != s2
 }
 
-*/
+
 ------------------------------------------------------------------
 
 sig Expr {
@@ -163,6 +168,7 @@ fact notSameRoot{
 fact parentAndChildHasTheSameExprTree {
 	all n1, n2: Node | n1.parent = n2 => n1.exprTree = n2.exprTree
 }
+
 
 
 -------------------------------Variable-----------------------------------------
@@ -234,4 +240,8 @@ pred p_ContainsCall [f: Function] {
 
 pred show {}
 
+<<<<<<< HEAD
 run show for 1
+=======
+run show for 3
+>>>>>>> 46bedbeaa28a24a7be51777b605de7ffd933598a
