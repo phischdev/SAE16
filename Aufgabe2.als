@@ -111,7 +111,6 @@ sig Literal extends Expr {}
 
 sig CallExpression {
 	calledFunction: one Function
-	
 }
 
 ---------------------------Expression Tree-----------------------
