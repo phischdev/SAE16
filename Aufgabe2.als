@@ -38,7 +38,6 @@ fact belongsToFunction{
 
 
 fact avoidRecursion{
-	f: Func
 	
 }
 
@@ -76,8 +75,7 @@ abstract sig Statement {
 }
 
 sig AssignementStatement  extends Statement{
-	variable: one DeclaredVariable,
-	expressions: one Expr
+	variable: one DeclaredVariable
 }
 
 sig ReturnStatement extends Statement{
