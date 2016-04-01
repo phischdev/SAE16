@@ -34,7 +34,7 @@ fact belongsToFunction{
 
 
 fact mainFunctionHasNoParameter{
-	all m: MainFunction | m.formalParameter = none
+	all m: MainFunction | m.formalParameters = none
 }
 
 fact mainFunctionBelongsToAFunction{
@@ -64,7 +64,7 @@ sig ActualParameter extends Parameter {
 
 
 fact reflexitivFormalParameter{
-	all f: Function | all p: FormalParameter | f.formalParameter = p <=> p.belongsTo = f
+	all f: Function | all p: FormalParameter | f.formalParameters = p <=> p.belongsTo = f
 }
 
 
@@ -94,7 +94,7 @@ sig ReturnStatement extends Statement{
 
 
 fact ReturnStatementLinearSequence {
-	all r: ReturnStatement | all s: LinearSequenceOfStatement | r.isIn = s <=> s.lastStatement = r
+	all r: ReturnStatement | some s: LinearSequenceOfStatement | r.isIn = s => s.lastStatement = r
 }
 
 
@@ -102,10 +102,8 @@ fact sequenceBelongsToFunction{
 	all f: Function | all s: LinearSequenceOfStatement   | f.sequence = s <=> s.belongsTo = f
 }
 
-
-
 fact allStatementMustAppear{
-	(all a: AssignementStatement |all s: LinearSequenceOfStatement  |a in s.statements) && (all d: VarDecl |all s: LinearSequenceOfStatement  |d in s.statements)
+	(all a: AssignementStatement | some s: LinearSequenceOfStatement  | a in s.statements) && (all d: VarDecl | some s: LinearSequenceOfStatement  |d in s.statements)
 }
 
 fact noCircle{
@@ -113,7 +111,7 @@ fact noCircle{
 }
 
 fact expressionMustAppearInStatement {
-	all e: Expr | all s: Statement | e in s.expression
+	all e: Expr | some s: Statement | e in s.expression
 }
 
 
@@ -122,14 +120,17 @@ fact lastStatementReturnstatement{
 }
 
 
-fact statement{
- all s: LinearSequenceOfStatement |all x: Statement | x in s.statements <=> x in (s.firstStatement.^nextStatement + s.firstStatement)
-} 
-
-fact ReturnStatement {
-	all r: ReturnStatement | all s: LinearSequenceOfStatement | r in s.statements
+fact noLoseStatement {
+  all x: Statement | some s: LinearSequenceOfStatement | x in s.statements
 }
 
+fact noLoseStatement2 {
+  all s: LinearSequenceOfStatement | s.statements = s.firstStatement.^nextStatement + s.firstStatement
+}
+
+fact ReturnStatement {
+	all r: ReturnStatement | some s: LinearSequenceOfStatement | r in s.statements
+}
 
 fact noItSelf{
 	all s:Statement | s.nextStatement != s
@@ -279,9 +280,9 @@ fun p_parameters [f: Function]: set FormalParameter {
   f.formalParameters
 }
 
-fun p_subexpr [e: Expr]: set Expr {
-  e.children
-}
+//fun p_subexpr [e: Expr]: set Expr {
+  
+//}
 
 
 -- Predicates --------------
@@ -295,7 +296,7 @@ pred p_ContainsCall [f: Function] {
 pred p_isAssigned [v: Variable] {
   some f: Function | some s:AssignementStatement | s in f.sequence.statements && s.variable = v
 }
-*/
+
 pred p_isRead [v: Variable] {
   some e: VariableReference | e.read = v
 }
@@ -312,7 +313,7 @@ pred p_isSubtype [t1: Type, t2: Type] {
 pred p_assignsTo [s: Statement, vd: VarDecl] {
   s.variable = vd.variable
 }
-
+*/
 pred show {}
 
 run show for 5
