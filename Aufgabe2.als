@@ -181,6 +181,8 @@ sig Variable {
 	belongsToOneFunction: one Function
 }
 
+sig VariableReference extends Expression{}
+
 
 sig DeclaredVariable {
 	type: one Type,
@@ -253,26 +255,28 @@ pred p_ContainsCall [f: Function] {
   # {x: Expr | x in ( f.sequence.firstStatement.^nextStatement ).expressions} > 0
 }
 
+/*
 pred p_isAssigned [v: Variable] {
   some f: Function | some s:AssignementStatement | s in f.sequence.statements && s.variable = v
 }
 
 pred p_isRead [v: Variable] {
-  some f: Function | some s:VariableReference | s in f.sequence.statement.expression && s.variable = v
+  some f: Function | some s:VariableReference | s in f.sequence.statements.expressions && s.variable = v
 }
+
 
 pred p_isDeclared [v: Variable] {
   some f: Function | some s:DeclarationStatemente | s in f.sequence.statements && s.variable = v
-}
+
 
 pred p_isSubtype [t1: Type, t2: Type] {
   t1 in t2.^superType
 }
 
-pred p_assignsTo [s: Statement, vd: VariabledDeclaration] {
+pred p_assignsTo [s: Statement, vd: VarDecl] {
   s.variable = vd.variable
 }
-
+*/
 
 pred show {}
 
