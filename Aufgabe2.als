@@ -20,10 +20,8 @@ sig Type {
 
 sig Function {
 	returnType: one Type, 
-	returnValue: one ReturnStatement,
 	formalParameter: set FormalParameter,
 	belongsToOneLinPr: one LinearProgram, 
-	returnStatements: some ReturnStatement,
 	sequence: one  LinearSequenceOfStatement
 }
 
@@ -72,7 +70,6 @@ sig LinearSequenceOfStatement {
 abstract sig Statement {
 	nextStatement: lone Statement,
 	expression: lone Expr
-    
 }
 
 sig AssignementStatement  extends Statement{
@@ -88,9 +85,7 @@ fact lastStatementIsReturnStatement {
 	all s: Statement | all o: LinearSequenceOfStatement | s not in o.lastStatement.nextStatement
 }
 
-fact returnStatementBelongsToOneFunction {
-	all f: Function | all r: ReturnStatement| r. belongsTo = f <=> r in f.returnStatements
-}
+
 
 fact allStatementMustAppear{
 	all a: AssignementStatement |all s: LinearSequenceOfStatement  |a in s.statements
@@ -240,6 +235,7 @@ fun p_numFunctionCalls[]:Int {
 	#CallExpression
 }
 
+
 /*fun p_expressionTypes[]:set Type {
 
 }*/
@@ -260,9 +256,9 @@ fun p_parameters[f:Function]:set FormalParameter {
 
 -- Predicates --------------
 
-/*
+
 pred p_ContainsCall [f: Function] {
-  # {x: Expr | x in ( f.sequence.firstStatement.^nextStatement ).expressions} > 0
+  # {x: Expr | x in ( f.sequence.firstStatement.^nextStatement ).expression} > 0
 }
 
 /*
