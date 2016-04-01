@@ -65,12 +65,12 @@ fact reflexitivFormalParameter{
 sig LinearSequenceOfStatement {
 	belongsTo: one Function,
 	firstStatement: one Statement,
-	statements: some Statement
+	lastStatement: one ReturnStatement
 }
 
 abstract sig Statement {
 	nextStatement: lone Statement,
-	expressions: some Expr
+	expression: lone Expr
     
 }
 
@@ -83,26 +83,25 @@ sig ReturnStatement extends Statement{
 	isIn: one LinearSequenceOfStatement
 }
 
-
+fact lastStatementIsReturnStatement {
+	all s: Statement | all o: LinearSequenceOfStatement | s not in o.lastStatement.nextStatement
+}
 
 fact returnStatementBelongsToOneFunction {
 	all f: Function | all r: ReturnStatement| r. belongsTo = f <=> r in f.returnStatements
 }
 
-
-fact statement{
- 	all s: LinearSequenceOfStatement |all x: Statement | x in s.statements <=> x in (s.firstStatement.^nextStatement + s.firstStatement)
-} 
-
-
 fact allStatementMustAppear{
-	all a: AssignementStatement |all s: LinearSequenceOfStatement  |a in s.statements
+	all a: AssignementStatement |all s: LinearSequenceOfStatement  |a in s.*firstStatement
 }
 
 fact noCircle{
 	all s1, s2: Statement | s1.nextStatement = s2 => s1 not in s2.^nextStatement
 }
 
+fact expressionMustAppearInStatement {
+	all e: Expr | all s: Statement | e in s.expression
+}
 
 fact noItSelf{
 	all s:Statement | s.nextStatement != s
@@ -181,11 +180,15 @@ sig Variable {
 	belongsToOneFunction: one Function
 }
 
+sig VariableReference extends Expr{
+	fvariable: lone FormalParameter,
+	avariable: lone AssignedVariable
+}
+
 
 sig DeclaredVariable {
 	type: one Type,
-	belongsTo: one Variable
-	
+	belongsTo: one Variable	
 }
 
 sig AssignedVariable extends DeclaredVariable {
@@ -198,6 +201,9 @@ sig VarDecl extends Statement{
 } // in UML we call it DeclarationStatement
 
 
+fact onlyOneVariableReference {
+	all v: VariableReference | all f: FormalParameter | all a: AssignedVariable| (f in v.fvariable => a not in  v.avariable) && (a in  v.avariable => f not in v.fvariable)
+}
 
 fact variablelist{
 	(all d: DeclaredVariable | all v: Variable | d in v.declaredVariables <=> d.belongsTo = v) &&
@@ -250,15 +256,31 @@ fun p_parameters[f:Function]:set FormalParameter {
 -- Predicates --------------
 
 pred p_ContainsCall [f: Function] {
-   # {x: Expr | x in ( f.sequence.firstStatement.^nextStatement ).expressions} > 0
+  # {x: Expr | x in ( f.sequence.firstStatement.^nextStatement ).expressions} > 0
+}
+
+/*
+pred p_isAssigned [v: Variable] {
+  some f: Function | some s:AssignementStatement | s in f.sequence.statements && s.variable = v
+}
+
+pred p_isRead [v: Variable] {
+  some f: Function | some s:VariableReference | s in f.sequence.statements.expressions && s.variable = v
 }
 
 
+pred p_isDeclared [v: Variable] {
+  some f: Function | some s:DeclarationStatemente | s in f.sequence.statements && s.variable = v
 
 
+pred p_isSubtype [t1: Type, t2: Type] {
+  t1 in t2.^superType
+}
 
-
-
+pred p_assignsTo [s: Statement, vd: VarDecl] {
+  s.variable = vd.variable
+}
+*/
 
 pred show {}
 
