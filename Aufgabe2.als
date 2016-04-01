@@ -25,9 +25,7 @@ sig Function {
 	sequence: one  LinearSequenceOfStatement
 }
 
-sig MainFunction extends Function{
-
-}
+sig MainFunction extends Function{}
 
 
 fact belongsToFunction{
@@ -35,10 +33,16 @@ fact belongsToFunction{
 }
 
 
+fact mainFunctionHasNoParameter{
+	all m: MainFunction | m.formalParameter = none
+}
+
+/*
+
 fact avoidRecursion{
 	
 }
-
+*/
 -------------------------Parameter--------------------------------
 
 abstract sig Parameter {
@@ -50,7 +54,9 @@ sig FormalParameter extends Parameter {
 	belongsToOneVariable: one Variable
 }
 
-sig ActualParameter extends Parameter {}
+sig ActualParameter extends Parameter {
+	expression: one Expression
+}
 
 
 fact reflexitivFormalParameter{
@@ -73,11 +79,11 @@ abstract sig Statement {
 }
 
 sig AssignementStatement  extends Statement{
-	variable: one DeclaredVariable
+	variable: one DeclaredVariable,
+	expressions: one Expr
 }
 
 sig ReturnStatement extends Statement{
-	belongsTo:  one Function,
 	isIn: one LinearSequenceOfStatement
 }
 
@@ -86,9 +92,8 @@ fact lastStatementIsReturnStatement {
 }
 
 
-
 fact allStatementMustAppear{
-	all a: AssignementStatement |all s: LinearSequenceOfStatement  |a in s.statements
+	(all a: AssignementStatement |all s: LinearSequenceOfStatement  |a in s.statements) && (all d: VarDecl |all s: LinearSequenceOfStatement  |d in s.statements)
 }
 
 fact noCircle{
@@ -116,12 +121,18 @@ fact differentNextStatement {
 
 sig Expr {
 	type: one Type
+	consistsOf: set Expr
 }
 
 sig Literal extends Expr {}
 
-sig CallExpression {
-	calledFunction: one Function
+sig CallExpression extends Expression {
+	calledFunction: one Function,
+	actualParameter: set ActualParameter
+}
+
+fact canNotConsistItself{
+	e: Expr | e not in e.consistsOf
 }
 
 ---------------------------Expression Tree-----------------------
@@ -177,7 +188,7 @@ sig Variable {
 	declaredVariables: set DeclaredVariable,
 	formalParameters: set FormalParameter, 
 	assignedVariables: set AssignedVariable,
-	belongsToOneFunction: one Function
+	belongsTo: one Function
 }
 
 sig VariableReference extends Expr{
@@ -187,18 +198,19 @@ sig VariableReference extends Expr{
 
 
 sig DeclaredVariable {
-	type: one Type,
-	belongsTo: one Variable	
+	type: one Type
 }
 
 sig AssignedVariable extends DeclaredVariable {
-	readIn: some Expr,
+	readIn: some Expr
 }
 
 
 sig VarDecl extends Statement{
 	type: one Type
-} // in UML we call it DeclarationStatement
+} 
+
+// in UML we call it DeclarationStatement
 
 
 fact onlyOneVariableReference {
@@ -209,18 +221,6 @@ fact variablelist{
 	(all d: DeclaredVariable | all v: Variable | d in v.declaredVariables <=> d.belongsTo = v) &&
 	(all p: FormalParameter | all v: Variable | p in v.formalParameters  <=> p.belongsToOneVariable = v) 
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
