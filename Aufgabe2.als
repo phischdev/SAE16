@@ -65,7 +65,8 @@ fact reflexitivFormalParameter{
 sig LinearSequenceOfStatement {
 	belongsTo: one Function,
 	firstStatement: one Statement,
-	lastStatement: one ReturnStatement
+	lastStatement: one ReturnStatement,
+	statements: some Statement
 }
 
 abstract sig Statement {
@@ -92,7 +93,7 @@ fact returnStatementBelongsToOneFunction {
 }
 
 fact allStatementMustAppear{
-	all a: AssignementStatement |all s: LinearSequenceOfStatement  |a in s.*firstStatement
+	all a: AssignementStatement |all s: LinearSequenceOfStatement  |a in s.statements
 }
 
 fact noCircle{
@@ -102,6 +103,10 @@ fact noCircle{
 fact expressionMustAppearInStatement {
 	all e: Expr | all s: Statement | e in s.expression
 }
+
+fact statement{
+ all s: LinearSequenceOfStatement |all x: Statement | x in s.statements <=> x in (s.firstStatement.^nextStatement + s.firstStatement)
+} 
 
 fact noItSelf{
 	all s:Statement | s.nextStatement != s
@@ -255,6 +260,7 @@ fun p_parameters[f:Function]:set FormalParameter {
 
 -- Predicates --------------
 
+/*
 pred p_ContainsCall [f: Function] {
   # {x: Expr | x in ( f.sequence.firstStatement.^nextStatement ).expressions} > 0
 }
