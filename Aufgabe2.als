@@ -5,11 +5,14 @@
 //------------Philipp Schimmelfennig -Panuya Balasuntharam------------
 //---------------------------------------------------------------
 
-abstract sig LinearProgram{
+sig LinearProgram{
 	function: some Function,
 	mainFunction: one MainFunction
 }
 
+fact {
+	#LinearProgram = 1
+}
 
 --------------------------Type-------------------------------------
 
@@ -93,6 +96,9 @@ sig ReturnStatement extends Statement{
 
 
 
+
+
+
 fact ReturnStatementLinearSequence {
 	all r: ReturnStatement | some s: LinearSequenceOfStatement | r.isIn = s => s.lastStatement = r
 }
@@ -104,6 +110,7 @@ fact sequenceBelongsToFunction{
 
 fact allStatementMustAppear{
 	(all a: AssignementStatement | some s: LinearSequenceOfStatement  | a in s.statements) && (all d: VarDecl | some s: LinearSequenceOfStatement  |d in s.statements)
+
 }
 
 fact noCircle{
@@ -121,15 +128,21 @@ fact lastStatementReturnstatement{
 
 
 fact noLoseStatement {
-  all x: Statement | some s: LinearSequenceOfStatement | x in s.statements
+ all x: Statement | some s: LinearSequenceOfStatement | x in s.statements
 }
+ 
 
-fact noLoseStatement2 {
-  all s: LinearSequenceOfStatement | s.statements = s.firstStatement.^nextStatement + s.firstStatement
+fact noLoseStatement2{
+	all s1, s2: Statement | some x: LinearSequenceOfStatement | (s1.nextStatement = s2)&&(s1 in x.statements ) => (s2 in x.statements)
 }
+ 
 
 fact ReturnStatement {
-	all r: ReturnStatement | some s: LinearSequenceOfStatement | r in s.statements
+ all r: ReturnStatement | some s: LinearSequenceOfStatement | r in s.statements
+}
+
+fact fuun{
+	#Statement >3
 }
 
 fact noItSelf{
@@ -255,7 +268,7 @@ fact variablelist{
 */
 
 //----------------------Functions--------------------------------
-
+/*
 fun p_numFunctionCalls[]: Int {
   # CallExpression
 }
@@ -280,14 +293,11 @@ fun p_parameters [f: Function]: set FormalParameter {
   f.formalParameters
 }
 
-//fun p_subexpr [e: Expr]: set Expr {
-  
-//}
 
 
 -- Predicates --------------
 
-
+/*
 pred p_ContainsCall [f: Function] {
   some x: Expr | x in f.sequence.statements.expression
 }
@@ -313,6 +323,7 @@ pred p_isSubtype [t1: Type, t2: Type] {
 pred p_assignsTo [s: Statement, vd: VarDecl] {
   s.variable = vd.variable
 }
+
 */
 pred show {}
 
