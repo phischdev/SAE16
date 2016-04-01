@@ -37,6 +37,10 @@ fact mainFunctionHasNoParameter{
 	all m: MainFunction | m.formalParameter = none
 }
 
+fact mainFunctionBelongsToAFunction{
+	all m: MainFunction | all p: LinearProgram | p.mainFunction = m <=> m.belongsToOneLinPr = p
+}
+
 /*
 
 fact avoidRecursion{
@@ -55,7 +59,7 @@ sig FormalParameter extends Parameter {
 }
 
 sig ActualParameter extends Parameter {
-	expression: one Expression
+	expression: one Expr
 }
 
 
@@ -87,9 +91,17 @@ sig ReturnStatement extends Statement{
 	isIn: one LinearSequenceOfStatement
 }
 
-fact lastStatementIsReturnStatement {
-	all s: Statement | all o: LinearSequenceOfStatement | s not in o.lastStatement.nextStatement
+
+
+fact ReturnStatementLinearSequence {
+	all r: ReturnStatement | all s: LinearSequenceOfStatement | r.isIn = s <=> s.lastStatement = r
 }
+
+
+fact sequenceBelongsToFunction{
+	all f: Function | all s: LinearSequenceOfStatement   | f.sequence = s <=> s.belongsTo = f
+}
+
 
 
 fact allStatementMustAppear{
@@ -104,9 +116,20 @@ fact expressionMustAppearInStatement {
 	all e: Expr | all s: Statement | e in s.expression
 }
 
+
+fact lastStatementReturnstatement{
+	all r: ReturnStatement | r.nextStatement = none
+}
+
+
 fact statement{
  all s: LinearSequenceOfStatement |all x: Statement | x in s.statements <=> x in (s.firstStatement.^nextStatement + s.firstStatement)
 } 
+
+fact ReturnStatement {
+	all r: ReturnStatement | all s: LinearSequenceOfStatement | r in s.statements
+}
+
 
 fact noItSelf{
 	all s:Statement | s.nextStatement != s
@@ -120,19 +143,19 @@ fact differentNextStatement {
 ------------------------------------------------------------------
 
 sig Expr {
-	type: one Type
+	type: one Type,
 	consistsOf: set Expr
 }
 
 sig Literal extends Expr {}
 
-sig CallExpression extends Expression {
+sig CallExpression extends Expr {
 	calledFunction: one Function,
 	actualParameter: set ActualParameter
 }
 
 fact canNotConsistItself{
-	e: Expr | e not in e.consistsOf
+	all e: Expr | e not in e.consistsOf
 }
 
 ---------------------------Expression Tree-----------------------
@@ -183,13 +206,17 @@ fact parentAndChildHasTheSameExprTree {
 
 
 -------------------------------Variable-----------------------------------------
-
+/*
 sig Variable {
 	declaredVariables: set DeclaredVariable,
 	formalParameters: set FormalParameter, 
 	assignedVariables: set AssignedVariable,
 	belongsTo: one Function
 }
+*/
+
+sig Variable {}
+
 
 sig VariableReference extends Expr{
 	fvariable: lone FormalParameter,
@@ -197,7 +224,7 @@ sig VariableReference extends Expr{
 }
 
 
-sig DeclaredVariable {
+sig DeclaredVariable extends Variable{
 	type: one Type
 }
 
@@ -217,11 +244,14 @@ fact onlyOneVariableReference {
 	all v: VariableReference | all f: FormalParameter | all a: AssignedVariable| (f in v.fvariable => a not in  v.avariable) && (a in  v.avariable => f not in v.fvariable)
 }
 
+/*
+
 fact variablelist{
 	(all d: DeclaredVariable | all v: Variable | d in v.declaredVariables <=> d.belongsTo = v) &&
 	(all p: FormalParameter | all v: Variable | p in v.formalParameters  <=> p.belongsToOneVariable = v) 
 }
 
+*/
 
 
 
@@ -286,4 +316,4 @@ pred p_assignsTo [s: Statement, vd: VarDecl] {
 
 pred show {}
 
-run show for 3
+run show for 5
