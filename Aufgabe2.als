@@ -181,13 +181,15 @@ sig Variable {
 	belongsToOneFunction: one Function
 }
 
-sig VariableReference extends Expression{}
+sig VariableReference extends Expr{
+	fvariable: lone FormalParameter,
+	avariable: lone AssignedVariable
+}
 
 
 sig DeclaredVariable {
 	type: one Type,
-	belongsTo: one Variable
-	
+	belongsTo: one Variable	
 }
 
 sig AssignedVariable extends DeclaredVariable {
@@ -200,6 +202,9 @@ sig VarDecl extends Statement{
 } // in UML we call it DeclarationStatement
 
 
+fact onlyOneVariableReference {
+	all v: VariableReference | all f: FormalParameter | all a: AssignedVariable| (f in v.fvariable => a not in  v.avariable) && (a in  v.avariable => f not in v.fvariabl)
+}
 
 fact variablelist{
 	(all d: DeclaredVariable | all v: Variable | d in v.declaredVariables <=> d.belongsTo = v) &&
