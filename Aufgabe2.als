@@ -20,7 +20,7 @@ sig Type {
 
 sig Function {
 	returnType: one Type, 
-	formalParameter: set FormalParameter,
+	formalParameters: set FormalParameter,
 	belongsToOneLinPr: one LinearProgram, 
 	sequence: one  LinearSequenceOfStatement
 }
@@ -54,7 +54,7 @@ sig ActualParameter extends Parameter {}
 
 
 fact reflexitivFormalParameter{
-	all f: Function | all p: FormalParameter | f.formalParameter = p <=> p.belongsTo = f
+	all f: Function | all p: FormalParameter | f.formalParameters = p <=> p.belongsTo = f
 }
 
 
@@ -115,14 +115,18 @@ fact differentNextStatement {
 ------------------------------------------------------------------
 
 sig Expr {
-	type: one Type
+  type: one Type,
+  children: set Expr,
+  parent: lone Expr     
 }
 
 sig Literal extends Expr {}
 
-sig CallExpression {
+sig CallExpression extends Expr {
 	calledFunction: one Function
 }
+
+
 
 ---------------------------Expression Tree-----------------------
 sig Node {
@@ -211,63 +215,51 @@ fact variablelist{
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //----------------------Functions--------------------------------
 
-
-fun p_numFunctionCalls[]:Int {
-	#CallExpression
+fun p_numFunctionCalls[]: Int {
+  # CallExpression
 }
 
-
-/*fun p_expressionTypes[]:set Type {
-
-}*/
-
-
-/*
-fun p_literalTypes[]:set Type {}
-*/
-
-
-/*
-fun p_parameters[f:Function]:set FormalParameter {
-
+fun p_expressionTypes[]:set Type {
+  Expr.type
 }
 
-*/
+fun p_literalTypes[]:set Type {
+  Literal.type
+}
+
+fun p_statementsInFunction [f: Function]: set Statement {
+  f.sequence.statements
+}
+
+fun p_statementsAfter [s: Statement]: set Statement {
+  s.*nextStatement
+}
+
+fun p_parameters [f: Function]: set FormalParameter {
+  f.formalParameters
+}
+
+fun p_subexpr [e: Expr]: set Expr {
+  e.children
+}
 
 
 -- Predicates --------------
 
 
 pred p_ContainsCall [f: Function] {
-  # {x: Expr | x in ( f.sequence.firstStatement.^nextStatement ).expression} > 0
+  some x: Expr | x in f.sequence.statements.expression
 }
 
 /*
 pred p_isAssigned [v: Variable] {
   some f: Function | some s:AssignementStatement | s in f.sequence.statements && s.variable = v
 }
-
+*/
 pred p_isRead [v: Variable] {
-  some f: Function | some s:VariableReference | s in f.sequence.statements.expressions && s.variable = v
+  some e: VariableReference | e.read = v
 }
 
 
@@ -282,7 +274,7 @@ pred p_isSubtype [t1: Type, t2: Type] {
 pred p_assignsTo [s: Statement, vd: VarDecl] {
   s.variable = vd.variable
 }
-*/
+
 
 pred show {}
 
