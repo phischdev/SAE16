@@ -1,9 +1,9 @@
 
 
-//------------------Project 1-------------------------------------
-//---------------------------------------------------------------
-//------------Philipp Schimmelfennig -Panuya Balasuntharam------------
-//---------------------------------------------------------------
+//------------------Project 1------------------------------------------------
+//-------------------------------------------------------------------------
+//------------Philipp Schimmelfennig -Panuya Balasuntharam----------------------
+//-------------------------------------------------------------------------
 
 sig LinearProgram{
 	function: some Function,
@@ -20,6 +20,11 @@ fact {
 sig Type {
 	isSubTypeOf: lone Type
 }
+
+sig Bool extends Type{}
+
+----------------------------Function----------------------------------------
+---------------------------------------------------------------------------
 
 
 sig Function {
@@ -51,6 +56,7 @@ fact sequenceIsReverseOfBelongsTo{
 fact avoidRecursion{
 	all f: Function| f.*(sequence.statements.expression.calledFunction) != f
 }
+// TODO: Main function cannot be called by a function
 
 
 
@@ -180,8 +186,8 @@ fact{
 	all a: AssignementStatement |  p_subtypeOf [a.variable.type, a.expression.type]
 }
 
-
-------------------------------------------------------------------
+------------------------------Expression------------------------------------
+---------------------------------------------------------------------------
 
 sig Expr {
 	type: one Type,
@@ -258,8 +264,9 @@ fact parentAndChildHasTheSameExprTree {
 
 sig Variable {
 	declared: one Bool, 
-	readIn: some Expr,
-	assigned: one Bool
+	readIn: some VariableReference,
+	assigned: one Bool, 
+	type: lone Type
 }
 
 
@@ -273,12 +280,22 @@ sig VarDecl extends Statement{
 	variable: one Variable
 } 
 
-
+// VariableReference reads either a FormalParameter or a Variable
 fact onlyOneVariableReference {
-	all v: VariableReference | all f: FormalParameter | all a: Variable| (f in v.fvariable => a not in  v.avariable) && (a in  v.avariable => f not in v.fvariable)
+	all v: VariableReference |  #(v.fvariable + v.avariable ) = 1
 }
 
-sig Bool extends Type{}
+
+// Variable and its VariableReference should have the same type
+fact{
+	all v: Variable|all f: FormalParameter|all r: VariableReference | (r.avariable = v => r.type = v.type) && (r.fvariable = f => r.type = f.type)
+}
+
+
+// avariable is the reverse of readIn
+fact{
+	all r: VariableReference | all v: Variable | r.avariable = v <=> v.readIn = r
+}
 
 
 //----------------------Functions--------------------------------
@@ -316,9 +333,11 @@ fun p_subexpr [e: Expr]: set Expr {
 --------- Predicates —------------
 
 
-pred p_ContainsCall [f: Function] {
+pred p_containsCall [f: Function] {
  some x: CallExpression | x in f.sequence.statements.expression
 }
+
+--TODO: Problem: Main Function is called by functions
 
 pred p_isAssigned [v: Variable] {
  some f: Function | some s:AssignementStatement | s in f.sequence.statements && v in s.var
@@ -326,29 +345,33 @@ pred p_isAssigned [v: Variable] {
 
 
 pred p_isRead [v: Variable] {
- some e: VariableReference | v in e.avariable // TODO
+ #(v.readIn)!=0 // TODO + noch nicht getestet
 }
 
 
 pred p_isDeclared [v: Variable] {
- some f: Function | some s: VarDecl | s in f.sequence.statements && v in s.variable
+ 	some f: Function | some s: VarDecl | s in f.sequence.statements && v in s.variable
 }
+
+//TODO: doesn't work
+
+pred p_isParameter[v:Variable]{} // TODO
 
 pred p_subtypeOf [t1: Type, t2: Type] {
  t1 in t2.*isSubTypeOf
 }
 
-
-
 pred p_assignsTo [s: Statement, vd: VarDecl] {
 	vd.variable in s.var
 }
 
-
-
 pred show { 
-	all u: Function | p_ContainsCall [u] 
+--	all u: Function | p_containsCall [u] 
+--	all v: Variable |p_isAssigned [v] 
+--	all v: Variable |p_isRead [v]
+--	all v: Variable| p_isDeclared [v] 
 }
 
 
 run show
+
