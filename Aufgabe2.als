@@ -134,7 +134,8 @@ fact {
 
 // A Statement and its NextStatement should belong to the same Linear Sequence
 fact {
-	all disj s1, s2: Statement | all x: LinearSequenceOfStatement | (s1.nextStatement = s2) && (s1.belongsToLinSeq = x) => (s2.belongsToLinSeq = x)
+--	all disj s1, s2: Statement | all x: LinearSequenceOfStatement | (s1.nextStatement = s2) && (s1.belongsToLinSeq = x) => (s2.belongsToLinSeq = x)
+	all x: LinearSequenceOfStatement | x.firstStatement in x.statements => x.firstStatement.*nextStatement in x.statements
 }
 
 // All Statements need to pointed by a LinearSequence
