@@ -4,76 +4,28 @@
 //-------------------------------------------------------------------------
 
 
-// Boolean
-abstract sig Bool {}
-one sig True, False extends Bool {}
+abstract sig Value {}
+one sig True, False, Undefined extends Value {}
 
-pred isTrue[b: Bool] { b in True }
+pred isTrue[b: Value] { b in True }
 
-pred isFalse[b: Bool] { b in False }
+pred isFalse[b: Value] { b in False }
 
-fun Not[b: Bool] : Bool {
- Bool - b
-}
-
-fun And[b1, b2: Bool] : Bool {
- subset_[b1 + b2, True]
-}
-
-fun Or[b1, b2: Bool] : Bool {
- subset_[True, b1 + b2]
-}
-
-fun Xor[b1, b2: Bool] : Bool {
- subset_[Bool, b1 + b2]
-}
-
-fun Nand[b1, b2: Bool] : Bool {
- subset_[False, b1 + b2]
-}
-
-fun Nor[b1, b2: Bool] : Bool {
- subset_[b1 + b2, False]
-}
-
-fun subset_[s1, s2: set Bool] : Bool {
- (s1 in s2) => True else False
-}
+pred isUndef[b: Value] { b in Undefined}
 
 --------------------------------------------------------------------------
-
-
 sig LinearProgram{
 	functions: some Function,
 	mainFunction: one Function
 }
 
-
 fact {
 	#LinearProgram = 1
 }
 
---------------------------Type---------------------------------------------
----------------------------------------------------------------------------
-
-sig Type {
-	parentType: lone Type
-}
-
-fact notOwnParent { 
-	all t: Type | t.parentType != t 
-}
-
-fact noRecursion { 
-	all disj t1, t2: Type | p_subtypeOf[t1, t2] => not p_subtypeOf[t2, t1] 
-}
-
 ----------------------------Function----------------------------------------
 ---------------------------------------------------------------------------
-
-
 sig Function {
-	returnType: one Type, 
 	parameters: set FormalParameter,
 	owner: one LinearProgram, 
 	firstStatement: one Statement,
@@ -87,10 +39,6 @@ fact belongsToFunction{
 fact functionsHasOwner {
 	all f: Function | some l: LinearProgram | f in l.functions
 } 
-
-fact mainFunctionHasNoParameter{
-	all m: LinearProgram.mainFunction | m.parameters= none
-}
 
 fact mainFunctionBelongsToAFunction{
 	all m: LinearProgram.mainFunction | all p: LinearProgram | p.mainFunction = m => m in p.functions
@@ -107,6 +55,25 @@ fact avoidRecursion{
 fact LastStatemenInList { 
 	all f: Function | f.lastStatement in f.firstStatement.*nextStatement 
 }
+
+-------------------------------------------------------------------------
+
+fact CalledOnce{
+	all f: Function | #{e: CallExpression| e.calledFunction = f} <= 1
+}
+
+
+-----------------------------Execution--------------------------------------
+---------------------------------------------------------------------------
+
+sig Execution{ 
+	evalVar: Statement -> Variable -> lone Value,
+	evalExpr: Expr -> lone Value
+}
+
+
+
+
 
 
 --------------------------Statement-----------------------------------------
@@ -134,9 +101,6 @@ fact StatementHasOwner {
 	all s: Statement | some f: Function | s.owner = f 
 }
 
-fact ReturnStatementTypeMatchFunctionType{
-	all s: ReturnStatement | p_subtypeOf [s.owner.returnType, s.expression.type]
-}
 
 fact ReturnStatementHasExpression { 
 	all s: ReturnStatement | s.expression != none 
@@ -176,34 +140,19 @@ fact FirstNoPredecessor {
 	all s: Function.firstStatement | all s1: Statement | s1.nextStatement != s 
 }
 
-fact AssignmentTypeMatch{
-	all a: AssignmentStatement |  p_subtypeOf [  a.var.type, a.expression.type]
-}
-
-fact FormalParameterCannotBeAssignedTo{
---	all a: AssignmentStatement |not a.var in FormalParameter
-} 
-
-fact DeclarationBeforeAssignment {
-	all s: AssignmentStatement | some d: VarDecl | s.var = d.variable => s in d.^nextStatement
-}
-
-fact DeclarationBeforeRead{
-	all v: VariableReference | some d: VarDecl | not v.reference in FormalParameter && v.reference = d.variable => ExpOwnerSt[v] in d.^nextStatement
-}
-
 ------------------------------Expression------------------------------------
 ---------------------------------------------------------------------------
 
 abstract sig Expr {
-   type: one Type,
    children: set Expr,
    parent: lone Expr,
    owner: lone Statement,
-   isParameter: one Bool
+   isParameter: one Value
 }
 
-sig Literal extends Expr {}
+sig Literal extends Expr {
+	value: one Value
+}
 
 sig CallExpression extends Expr {
    calledFunction: one Function,
@@ -246,16 +195,19 @@ fact ParentsMatchChildren {
  all e1, e2: Expr | e2 in e1.children <=> e2.parent = e1
 }
 
-fact ParameterTypeMatch {
-    all e: CallExpression | all t: e.calledFunction.parameters.type |
-        # { p: e.calledFunction.parameters | p.type = t } = # { p: e.parameters | p.type = t}
+
+-------------------------------------------------------------------------
+sig And extends Expr{}
+
+sig Not extends Expr{}
+
+fact BinaryAnd{
+	all a: And | #a.children = 2
 }
 
-fact CallExpressionMatchFunctionType{
-	all c: CallExpression | c.calledFunction.returnType = c.type
-
+fact UnaryNot{
+	all n: Not | #n.children = 1
 }
-
 -------------------------Parameter-----------------------------------------
 ---------------------------------------------------------------------------
 
@@ -281,33 +233,17 @@ fact FormalParametersAreDeclaredAndAssigned{
 
 -------------------------------Variable-------------------------------------
 ---------------------------------------------------------------------------
-sig Variable { 
-	type: one Type
-}
+sig Variable {}
 
 sig VariableReference extends Expr{
 	reference: one Variable
 }
 
-sig VarDecl extends Statement{
-	variable: one Variable
-} 
-
-fact ReferenceVariableTypeMatch{
-	all v: Variable|all r: VariableReference | (r.reference = v => r.type = v.type)
-}
-
+ 
 fact WithoutAssignmentNoReference{
 	all v: Variable| (not v in FormalParameter &&  some r: VariableReference | r.reference =v)  =>(some s:AssignmentStatement | s.var = v)
 }
 
-fact NeedsDeclarationStatement{
-	all v: Variable | not v in FormalParameter => (some s:VarDecl | s.variable = v) 
-}
-
-fact NoParameterDeclaration{
-	all s: VarDecl | not  s.variable in FormalParameter
-}
 
 fact NeedsAssignmentStatement{
 	all v: Variable | not v in FormalParameter => (some s:AssignmentStatement | v = s.var )
@@ -321,10 +257,6 @@ fact CallExpressionNoRecursion{
 	all c: CallExpression | not c in c.parameters
 }
 
-fact VarDeclNoExpr { 
-	all s: VarDecl | s.expression = none 
-}
-
 ---------------------------------------------------------------------------
 //----------------------Functions------------------------------------------
 -------------------------------------------------------------------------
@@ -333,13 +265,6 @@ fun p_numFunctionCalls[]: Int {
  	# CallExpression
 }
 
-fun p_expressionTypes[]:set Type {
- 	Expr.type
-}
-
-fun p_literalTypes[]:set Type {
- 	Literal.type
-}
 
 fun p_statementsInFunction [f: Function]: set Statement {
  	f.firstStatement.*nextStatement
@@ -357,7 +282,6 @@ fun p_subexpr [e: Expr]: set Expr {
  	e.children
 }
 
-
 ---------------------------------------------------------------------------
 ------------------------------- Predicates —--------------------------------
 ---------------------------------------------------------------------------
@@ -374,21 +298,11 @@ pred p_isRead [v: Variable] {
 	some r: VariableReference | v in r.reference
 }
 
-pred p_isDeclared [v: Variable] {
- 	some f: Function | some s: VarDecl | s in f.*firstStatement && v in s.variable
-}
-
 pred p_isParameter[v:Variable]{
 	some f: Function | v in f.parameters
 } 
 
-pred p_subtypeOf [t1: Type, t2: Type] {
- 	t2 in t1.*parentType
-}
 
-pred p_assignsTo [s: Statement, vd: VarDecl] {
-	vd.variable in s.var
-}
 
 /*
 pred test{ 
@@ -409,66 +323,27 @@ pred show{}
 run show for 3
 
 
+
 ---------------------------------------------------------------------------
---------------------------------Task C-------------------------------------
+------------------------------- Task D - Functions —-------------------------
+---------------------------------------------------------------------------
+
+fun  p_val[e:Execution,p:Expr]:Value {
+	p.(e.evalExpr)
+}
+
+fun p_numNot[]:Int {
+	#Not
+}
 
 /*
-pred task1 {
-	#Function = 1 
-	#CallExpression = 2
-}
-
-run task1 for 4 
-
-//Doesn't work
+fun p_retval[e:Execution,f:Function]:Value {}
 
 
-pred task2 {
-	#Function = 2 
-	#CallExpression = 2
-}
+fun p_argval[e:Execution,f:Function,p:FormalParameter]:Value{}
 
 
-run task2 for 4 */
 
-//Doesn't work
+fun p_valbefore[e:Execution, s:Statement, v:Variable] : Value {}
 
-/*
-pred task3 {
-	#AssignmentStatement =1
-	#Variable = 1
-	#Literal = 1
-}
-
-
-run task3 for 4
-
-// Doesn't work
-*/
-
-/*
-pred task4{
-	#AssignmentStatement =1
-	#CallExpression =1
-	#Variable = 1
-	all a: AssignmentStatement | some c: CallExpression | 
-	(c = a.expression) && 
-	(a.var.type != c.type) && // VariableType not CallExpressionType
-	(c.calledFunction.returnType != c.calledFunction.lastStatement.expression.type) 
-
-}
-
-run task4 for 4
-*/
-
-/*
-pred task5{
-	#Literal = 1
-	#Type = 2
-	
-	all disj t1, t2: Type | not p_subtypeOf [t1, t2] && not p_subtypeOf [t2, t1]
-
-}
-
-run task5 for 2
 */
