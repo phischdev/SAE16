@@ -239,19 +239,45 @@
 		%	Aufgabe S1
 		%----------------------------------------------------------------------------------------
 		\begin{homeworkProblem}[Task A.]
-			What we cannot express in UML\\
+			What we cannot express in UML, that:\\
 			\begin{itemize}
 				\item
-				We cannot express that a Declared Variable is changed to a Assigned Variabe when assigned in an assignment statement.
+				Parameters cannot be assigned and declared.
+				\item
+				Variables need to be declared before being assigned and need to be assigned before being read.
+				\item
+				Functions may not contain unreachable Statements.
+				\item
+				Recursion is not allowed
+				\item
+				Return value of a functions must match the functions return type
+				\item
+				The expression tree doesn't allow recursion
+				\item
+				The typing rules hold
+				\item
+				Variables are declared once and parameters are not declared
+				\item
+				Variables cannot be assigned without a following read
+				\item
+				Expression not on the right-hand side.
+			\end{itemize}
+		\end{homeworkProblem}
+		\begin{homeworkProblem}[Task B.]
+			What we cannot express in Alloy
+			\begin{itemize}
+				\item 
+				We cannot determine how the actual parameters are mapped to the formal parameters besides matching their type.
 			\end{itemize}
 		\end{homeworkProblem}
 		\begin{homeworkProblem}[Task C.]
 			\begin{enumerate}
-				\item A program with one function, 2 function calls
-				This cannot be achieved. A program with exactly one function contains only the main function. Since we don't allow recursion the main function cannot have a function call
-				\item A program with two functions, 2 function calls
+				\item A program with one function, 2 function calls\\
+				This cannot be achieved. A program with exactly one function contains only the main function. Since we don't allow recursion the main function cannot have a function call.
+				\item A program with two functions, 2 function calls\\
 				This still cannot be achieved. Since we don't allow recursion the main function (\emph{Function A}) can only call \emph{Function B}. \emph{Function B} cannot call itself, so it has to call \emph{Function A}. But this would lead to indirect recursion which is still not allowed.
 			\end{enumerate}
+			Exercise 3 to 5 are feasible models and can be found in the folder.
 		\end{homeworkProblem}
 		
 	\end{document}
