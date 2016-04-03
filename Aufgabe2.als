@@ -101,7 +101,7 @@ fact mainFunctionCannotBeCalled {
 }
 
 fact avoidRecursion{
-	all f: Function| f.*((firstStatement.*nextStatement).expression.calledFunction) != f
+	all f: Function|not f in f.^((firstStatement.*nextStatement).expression.calledFunction)
 }
 
 fact LastStatemenInList { 
@@ -136,11 +136,11 @@ fact StatementHasOwner { all s: Statement | some f: Function | s.owner = f }
 
 fact ReturnStatementHasExpression { all s: ReturnStatement | s.expression != none }
 fact ReturnNoSucessor { all s: ReturnStatement | s.nextStatement = none }
-fact StatementsHaveSuccessor { all s: Statement | s not in ReturnStatement =>s.nextStatement != none }
+fact StatementsHaveSuccessor { all s: Statement | not s in ReturnStatement =>s.nextStatement != none }
 fact NotReflexive { all s: Statement | s.nextStatement != s }
 
 fact StatementNoRecursion {
-	all disj s1, s2: Statement | s1.nextStatement = s2 => s1 not in s2.^nextStatement
+	all disj s1, s2: Statement | s1.nextStatement = s2 =>not s1 in s2.^nextStatement
 }
 
 fact MaxOnePredecessor {
@@ -149,7 +149,7 @@ fact MaxOnePredecessor {
 }
 
 fact MinOnePredecessor {
-	all s: Statement | s not in Function.firstStatement => some s1: Statement | s1.nextStatement = s
+	all s: Statement | not s  in Function.firstStatement => some s1: Statement | s1.nextStatement = s
 }
 
 
@@ -204,7 +204,7 @@ fact IsParameterFact {
 }
 
 fact noExprRecursion{
-   all e: Expr | (e not in e.^children) && (e != e.parent)
+   all e: Expr | (not e in e.^children) && (e != e.parent)
 }
 
 fact LiteralNoChildren {
@@ -262,9 +262,7 @@ sig VarDecl extends Statement{
 	variable: one Variable
 } 
 
-fact{
-#AssignmentStatement >2
-}
+
 
 
 // Variable and its VariableReference should have the same type
@@ -275,11 +273,11 @@ fact{
 
 
 fact {
-	all v: Variable|all r: VariableReference | (v.type = none) => (v not in r.reference)
+	all v: Variable|all r: VariableReference | (v.type = none) => (not v  in r.reference)
 }
 
 fact {
-	all c: CallExpression | c not in c.parameters
+	all c: CallExpression | not c in c.parameters
 }
 
 
@@ -352,7 +350,7 @@ pred p_assignsTo [s: Statement, vd: VarDecl] {
 	vd.variable in s.var
 }
 
-pred hall{ 
+pred test{ 
 	all u: Function | p_containsCall [u] 
 	all v: Variable |p_isAssigned [v] 
 	all v: Variable |p_isRead [v]
@@ -394,19 +392,19 @@ run task2 for 4 */
 
 //Doesn't work
 
-
+/*
 pred task3 {
-	#AssignmentStatement = 3
-//	#Variable = 1
-//	#Literal = 1
+	#AssignmentStatement =1
+	#Variable = 1
+	#Literal = 1
 }
 
 
-run task3 for 10
+run task3 for 4
 
 // Doesn't work
+*/
 
-/*
 pred task4{
 	all a: AssignmentStatement | all c: CallExpression | 
 	(c in a.expressions) && 
@@ -415,6 +413,5 @@ pred task4{
 
 }
 
-run task4 for 7
+run task4 for 4
 
-*/
