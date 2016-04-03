@@ -50,7 +50,7 @@ sig LinearProgram{
 
 
 fact {
-	#LinearProgram = 1 
+	#LinearProgram = 1
 }
 
 --------------------------Type---------------------------------------------
@@ -101,7 +101,7 @@ fact mainFunctionCannotBeCalled {
 }
 
 fact avoidRecursion{
-	--all f: Function| f.*(sequence.statements.expression.calledFunction) != f
+	all f: Function| f.*((firstStatement.*nextStatement).expression.calledFunction) != f
 }
 
 fact LastStatemenInList { 
@@ -155,17 +155,17 @@ fact MinOnePredecessor {
 
 fact FirstNoPredecessor { all s: Function.firstStatement | all s1: Statement | s1.nextStatement != s }
 
-fact{
---	all a: AssignmentStatement |  p_subtypeOf [a.variable.type, a.expression.type]
+fact AssignmentTypeMatch{
+	all a: AssignmentStatement |  p_subtypeOf [a.variable.type, a.expression.type]
 }
 
 
-fact {
-	all a: AssignmentStatement |all f: FormalParameter| (a.var.declared = True) && (a.var != f)
+fact FormalParameterCannotBeAssignedTo{
+	all a: AssignmentStatement |all f: FormalParameter| (isTrue[a.var.declared]) && (a.var != f)
 } 
 
-fact {
-	all v: VarDecl | v.variable.declared = False
+fact OnlyNonDeclaredVariablesCanBeDeclared{
+	all v: VarDecl | isFalse[v.variable.declared]
 }
 
 
@@ -173,38 +173,51 @@ fact {
 ---------------------------------------------------------------------------
 
 sig Expr {
-	type: one Type,
-	children: set Expr,
-	parent: lone Expr,
-	owner: lone Statement
+   type: one Type,
+   children: set Expr,
+   parent: lone Expr,
+   owner: lone Statement,
+   isParameter: one Bool
 }
 
 sig Literal extends Expr {}
 
 sig CallExpression extends Expr {
-	calledFunction: one Function,
-	parameters: set Expr
+   calledFunction: one Function,
+   parameters: set Expr
 }
 
 fact ExpressionOwnership {
-	all e: Expr | all s: Statement | e.owner = s <=> s.expression = e
+   all e: Expr | all s: Statement | e.owner = s <=> s.expression = e
 }
 
 fact HasParentOrOwner {
-	all e: Expr | e.owner = none <=> e.parent != none
+   all e: Expr | isFalse [e.isParameter] =>( e.owner = none <=> e.parent != none )
+}
+
+fact ExprAsParameterNoOwnerNorParent {
+   all e: Expr | isTrue [e.isParameter] => e.owner = none && e.parent = none
+}
+
+fact IsParameterFact {
+   all e: Expr | isTrue [e.isParameter] <=> some c: CallExpression | e in c.parameters
 }
 
 fact noExprRecursion{
-	all e: Expr | (e not in e.^children) && (e != e.parent)
+   all e: Expr | (e not in e.^children) && (e != e.parent)
 }
 
 fact LiteralNoChildren {
-	all e: Expr | all l: Literal | e.parent != l
+   all e: Expr | all l: Literal | e.parent != l
+}
+
+fact ParentsMatchChildren {
+ all e1, e2: Expr | e2 in e1.children <=> e2.parent = e1
 }
 
 fact ParamterTypeMatch {
- 	all e: CallExpression | all t: e.calledFunction.parameters.type | 
- 	# { p: e.calledFunction.parameters | p.type = t } = # { p: e.parameters | p.type = t}
+    all e: CallExpression | all t: e.calledFunction.parameters.type |
+        # { p: e.calledFunction.parameters | p.type = t } = # { p: e.parameters | p.type = t}
 }
 
 -------------------------Parameter-----------------------------------------
@@ -222,59 +235,14 @@ fact FPHasOwner {
  all p: FormalParameter | some f: Function | p.owner = f
 }
 
-fact {
+fact FormalParameterHasType{
 	all f: FormalParameter | f.type != none
 }
 
-fact{
-	all f: FormalParameter | (f.declared= True) && (f.assigned = True)
-}
----------------------------Expression Tree-----------------------
-/*sig Node {
-	parent: lone Node,
-	children: set Node,
-	exprTree: one ExpressionTree
+fact FormalParametersAreDeclaredAndAssigned{
+	all f: FormalParameter | (isTrue[f.declared]) && (isTrue[f.assigned])
 }
 
-sig ExpressionTree {
-	root: one Node,
-	leaves: set Node
-}
-
-
-fact parentChildrenRelationsship{
-	all n1, n2: Node | n1. parent = n2  <=> n1 in n2.children 
-}
-
-
-// unsicher ob dies funktioniert. Ich möchte root definieren
-fact root{
-	(all r: ExpressionTree | all n: Node | r.root in n.^parent)&&
-	(all r: ExpressionTree | all n: Node | r. root not in n.^children)
-}
-
-fact notSameRootAndLeaves{
-	all e: ExpressionTree | e.root not in e.leaves
-}
-
-fact notOwnChild {
-	all n: Node | n not in n.children
-}
-
-fact notOwnParent{
-	all n: Node | n not in n.parent
-}
-
-fact notSameRoot{
-	all e1, e2: ExpressionTree | e1.root != e2.root
-}
-
-fact parentAndChildHasTheSameExprTree {
-	all n1, n2: Node | n1.parent = n2 => n1.exprTree = n2.exprTree
-}
-
-
-*/
 -------------------------------Variable-------------------------------------
 ---------------------------------------------------------------------------
 
@@ -315,11 +283,12 @@ fact {
 }
 
 
+fact VarDeclNoExpr { all s: VarDecl | s.expression = none }
 
-/*
+
 ---------------------------------------------------------------------------
-//----------------------Functions--------------------------------------------
----------------------------------------------------------------------------
+//----------------------Functions------------------------------------------
+-------------------------------------------------------------------------
 
 fun p_numFunctionCalls[]: Int {
  # CallExpression
@@ -334,73 +303,118 @@ fun p_literalTypes[]:set Type {
 }
 
 fun p_statementsInFunction [f: Function]: set Statement {
- f.sequence.statements
+ f.firstStatement.*nextStatement
 }
 
 fun p_statementsAfter [s: Statement]: set Statement {
- s.*nextStatement
+ s.^nextStatement
 }
 
 fun p_parameters [f: Function]: set FormalParameter {
- f.formalParameters
+ f.parameters
 }
-
-
 
 fun p_subexpr [e: Expr]: set Expr {
  e.children
 }
 
-*/
+
 ---------------------------------------------------------------------------
 ------------------------------- Predicates —--------------------------------
 ---------------------------------------------------------------------------
-/*
-pred p_containsCall [f: Function] {
- some x: CallExpression | x in f.sequence.statements.expression
-}
 
---TODO: Problem: Main Function is called by functions
+pred p_containsCall [f: Function] {
+ some x: CallExpression | x in f.*firstStatement.expression
+}
 
 pred p_isAssigned [v: Variable] {
- some f: Function | some s:AssignmentStatement | s in f.sequence.statements && v in s.var
+ some f: Function | some s:AssignmentStatement | s in f.*firstStatement && v in s.var
 }
 
-
-
 pred p_isRead [v: Variable] {
- #(v.readIn) != 0 
+	some r: VariableReference | v in r.reference
 }
 
 
 pred p_isDeclared [v: Variable] {
- 	some f: Function | some s: VarDecl | s in f.sequence.statements && v in s.variable
+ 	some f: Function | some s: VarDecl | s in f.*firstStatement && v in s.variable
 }
 
-//TODO: doesn't work
+pred p_isParameter[v:Variable]{
+	some f: Function | v in f.parameters
+} 
 
-
-pred p_isParameter[v:Variable]{} // TODO
-*/
 pred p_subtypeOf [t1: Type, t2: Type] {
  	t1 in t2.*parentType
 }
-/*
+
 pred p_assignsTo [s: Statement, vd: VarDecl] {
 	vd.variable in s.var
 }
-*/
-pred hall{ 
---	all u: Function | p_containsCall [u] 
---	all v: Variable |p_isAssigned [v] 
---	all v: Variable |p_isRead [v]
---	all v: Variable| p_isDeclared [v] 
 
---all t1, t2: Type| p_subtypeOf [t1, t2]
---	all s: Statement| all vd: VarDecl |p_assignsTo [s,vd] 
+pred hall{ 
+	all u: Function | p_containsCall [u] 
+	all v: Variable |p_isAssigned [v] 
+	all v: Variable |p_isRead [v]
+	all v: Variable| p_isDeclared [v] 
+
+	all t1, t2: Type| p_subtypeOf [t1, t2]
+	all s: Statement| all vd: VarDecl |p_assignsTo [s,vd] 
 }
 
 
-pred show{}
+---------------------------------------------------------------------------
+-------------------------------Show----------------------------------------
+---------------------------------------------------------------------------
+//pred show{}
+//run show for 10
 
-run show for 5
+
+---------------------------------------------------------------------------
+--------------------------------Task C-------------------------------------
+
+/*
+pred task1 {
+	#Function = 1 
+	#CallExpression = 2
+}
+
+run task1 for 4 
+
+//Doesn't work
+
+
+pred task2 {
+	#Function = 2 
+	#CallExpression = 2
+}
+
+
+run task2 for 4 */
+
+//Doesn't work
+
+
+pred task3 {
+	#AssignmentStatement = 3
+//	#Variable = 1
+//	#Literal = 1
+}
+
+
+run task3 for 10
+
+// Doesn't work
+
+/*
+pred task4{
+	all a: AssignmentStatement | all c: CallExpression | 
+	(c in a.expressions) && 
+	(c.calledFunction.returnType != c.calledFunction.lastStatement.type ) &&
+	(a.expressions.type != c.calledFunction.returnType)
+
+}
+
+run task4 for 7
+
+*/
