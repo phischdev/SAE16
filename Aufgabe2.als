@@ -104,7 +104,9 @@ fact avoidRecursion{
 	--all f: Function| f.*(sequence.statements.expression.calledFunction) != f
 }
 
-fact LastStatemenInList { all f: Function | f.lastStatement in f.firstStatement.*nextStatement }
+fact LastStatemenInList { 
+	all f: Function | f.lastStatement in f.firstStatement.*nextStatement 
+}
 
 
 --------------------------Statement-----------------------------------------
@@ -158,6 +160,14 @@ fact{
 }
 
 
+fact {
+	all a: AssignmentStatement |all f: FormalParameter| (a.var.declared = True) && (a.var != f)
+} 
+
+fact {
+	all v: VarDecl | v.variable.declared = False
+}
+
 
 ------------------------------Expression------------------------------------
 ---------------------------------------------------------------------------
@@ -192,10 +202,10 @@ fact LiteralNoChildren {
 	all e: Expr | all l: Literal | e.parent != l
 }
 
-/*
-fact MatchesParameters {
- 	all e: CallExpression | # e.calledFunction.parameters = # e.parameters
-}*/
+fact ParamterTypeMatch {
+ 	all e: CallExpression | all t: e.calledFunction.parameters.type | 
+ 	# { p: e.calledFunction.parameters | p.type = t } = # { p: e.parameters | p.type = t}
+}
 
 -------------------------Parameter-----------------------------------------
 ---------------------------------------------------------------------------
@@ -304,13 +314,7 @@ fact {
 	all c: CallExpression | c not in c.parameters
 }
 
-fact {
-	all a: AssignmentStatement |all f: FormalParameter| (a.var.declared = True) && (a.var != f)
-} 
 
-fact {
-	all v: VarDecl | v.variable.declared = False
-}
 
 /*
 ---------------------------------------------------------------------------
