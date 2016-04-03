@@ -117,7 +117,7 @@ abstract sig Statement {
 }
 
 sig AssignmentStatement  extends Statement{
-	//var: one Variable,
+	var: one Variable,
 	expressions: one Expr
 }
 
@@ -127,15 +127,11 @@ sig ReturnStatement extends Statement{}
 fact StatementOwnership {
 	all f: Function | all s: Statement | s in f.firstStatement.*nextStatement <=> s.owner = f
 }
-<<<<<<< HEAD
+
 
 fact StatementHasOwner { all s: Statement | some f: Function | s.owner = f }
 
-=======
 
-fact StatementHasOwner { all s: Statement | some f: Function | s.owner = f }
-
->>>>>>> origin/master
 fact ReturnStatementHasExpression { all s: ReturnStatement | s.expression != none }
 fact ReturnNoSucessor { all s: ReturnStatement | s.nextStatement = none }
 fact StatementsHaveSuccessor { all s: Statement | s not in ReturnStatement =>s.nextStatement != none }
@@ -147,21 +143,14 @@ fact StatementNoRecursion {
 
 fact MaxOnePredecessor {
 	all s: Statement | # {s1: Statement | s1.nextStatement = s} <= 1
-<<<<<<< HEAD
+
 }
 
 fact MinOnePredecessor {
 	all s: Statement | s not in Function.firstStatement => some s1: Statement | s1.nextStatement = s
 }
 
-=======
-}
 
-fact MinOnePredecessor {
-	all s: Statement | s not in Function.firstStatement => some s1: Statement | s1.nextStatement = s
-}
-
->>>>>>> origin/master
 fact FirstNoPredecessor { all s: Function.firstStatement | all s1: Statement | s1.nextStatement != s }
 
 fact{
@@ -216,11 +205,7 @@ sig FormalParameter extends Variable{
 }
 
 fact FormalParameter{
-<<<<<<< HEAD
 	all f: Function | all p: FormalParameter | p in f.parameters <=> p.owner = f
-=======
-	all f: Function | all p: FormalParameter | p in f.formalParameters <=> p.owner = f
->>>>>>> origin/master
 }
 
 fact FPHasOwner {
