@@ -14,8 +14,6 @@ fact {
 	#LinearProgram = 1
 }
 
-
-
 --------------------------Type---------------------------------------------
 ---------------------------------------------------------------------------
 
@@ -46,6 +44,9 @@ fact mainFunctionBelongsToAFunction{
 	all m: MainFunction | all p: LinearProgram | p.mainFunction = m <=> m.belongsToOneLinPr = p
 }
 
+fact sequenceIsReverseOfBelongsTo{
+	all f: Function | all x: LinearSequenceOfStatement | f.sequence = x <=> x.belongsTo = f
+}
 
 fact avoidRecursion{
 	all f: Function| f.*(sequence.statements.expression.calledFunction) != f
@@ -87,7 +88,7 @@ sig LinearSequenceOfStatement {
 abstract sig Statement {
 	nextStatement: lone Statement,
 	expression: lone Expr,
-	belongsTo: one LinearSequenceOfStatement 
+	belongsToLinSeq: one LinearSequenceOfStatement 
 }
 
 sig AssignementStatement  extends Statement{
@@ -97,77 +98,83 @@ sig AssignementStatement  extends Statement{
 
 sig ReturnStatement extends Statement{}
 
+
+-----------------------------------------------
+
+--fact{#LinearSequenceOfStatement = 1}
+
 fact{#AssignementStatement >1}
 
 
 fact {
-	all s:Statement | all x: LinearSequenceOfStatement | s.belongsTo = x <=> s in x.statements
+   all s:Statement | all x: LinearSequenceOfStatement | (s.belongsToLinSeq = x) => s in x.statements
 }
 
-/*
-
-fact ReturnStatementLinearSequence {
-	all r: ReturnStatement | some s: LinearSequenceOfStatement | r.isIn = s => s.lastStatement = r
-}
-*/
-
-fact sequenceBelongsToFunction{
-	all f: Function | all s: LinearSequenceOfStatement   | f.sequence = s <=> s.belongsTo = f
+// First- and LastStatement should 
+fact{
+	all x: LinearSequenceOfStatement |  (x.lastStatement in x.statements) && (x.firstStatement in x.statements)
 }
 
+
+--TODO: Next 3 facts doesn't work
+--ProblemToSolve: A Statement need to pointed just by one LinearSequence
+
+fact {
+	--all s:Statement | all disj x1, x2: LinearSequenceOfStatement | (s in x1.statements => s not in x2.statements ) 
+}
+
+fact {
+--	all s:Statement | all disj x1, x2: LinearSequenceOfStatement | (x1.lastStatement = s => x2.lastStatement !=s)  
+}
+
+fact {
+--	all s:Statement | all disj x1, x2: LinearSequenceOfStatement | (x1.firstStatement = s => x2.firstStatement !=s)  
+}
+
+
+// A Statement and its NextStatement should belong to the same Linear Sequence
+fact {
+	all disj s1, s2: Statement | all x: LinearSequenceOfStatement | (s1.nextStatement = s2) && (s1.belongsToLinSeq = x) => (s2.belongsToLinSeq = x)
+}
+
+// All Statements need to pointed by a LinearSequence
 fact allStatementMustAppear{
-	(all s: Statement | some x: LinearSequenceOfStatement  | s in x.statements) 
+	all s: Statement | some x: LinearSequenceOfStatement  | s in x.statements
 }
 
+// Avoid Circle of NextStatements
 fact noCircle{
-	all s1, s2: Statement | s1.nextStatement = s2 => s1 not in s2.^nextStatement
+	all disj s1, s2: Statement | s1.nextStatement = s2 => s1 not in s2.^nextStatement
 }
 
 /*
 fact expressionMustAppearInStatement {
 	all e: Expr | some s: Statement | e in s.expression
-}*/
+}
 
+*/
 
 // FirstStatement doesn't have a predecessor  
 fact firstStatement {
-	all s1, s2: Statement | all x: LinearSequenceOfStatement  |(s2 = x.firstStatement) => (s1.nextStatement ! = s2)  
+	all disj s1, s2: Statement | all x: LinearSequenceOfStatement  |(s2 = x.firstStatement) => (s1.nextStatement ! = s2)  
 }
 
-fact {
-	all  s: LinearSequenceOfStatement.firstStatement | all x: Statement | x.nextStatement != s
-}
-
-
+// ReturnStatement has no NextStatement and the others need to have one
 fact lastStatementReturnstatement{
 	(all r: ReturnStatement | r.nextStatement = none) && (all a: AssignementStatement |# a.nextStatement = 1) && (all v: VarDecl |# v.nextStatement =1)
 }
 
-
-
-fact noLoseStatement {
- all x: Statement | some s: LinearSequenceOfStatement | x in s.statements
-}
- 
-
-fact noLoseStatement2{
-	//all s1, s2: Statement | all x: LinearSequenceOfStatement | (s1.nextStatement = s2) &&(s1 in x.statements ) =>(s2 in x.statements)
-}
-
-fact{
-   all s:  LinearSequenceOfStatement | all  x: Statement | s.firstStatement = x => x in s.statements
-	--all s: LinearSequenceOfStatement.statements | all x: LinearSequenceOfStatement.firstStatement | all c: x.*nextStatement | x in s => c in s
-}
- 
-
+ // A Statement cannot be NextStatement of itself
 fact notReflexivNextStatement{
 	all s:Statement | s.nextStatement != s
 }
 
+// Two Statements have different NextStatements
 fact differentNextStatement {
-  all disj s1, s2, s3: Statement | s1.nextStatement = s2 => s3.nextStatement != s2
+	all disj s1, s2, s3: Statement | s1.nextStatement = s2 => s3.nextStatement != s2
 }
 
+// 
 fact{
 	all a: AssignementStatement |  p_subtypeOf [a.variable.type, a.expression.type]
 }
@@ -264,8 +271,6 @@ sig VarDecl extends Statement{
 	type: one Type,
 	variable: one Variable
 } 
-
-// in UML we call it DeclarationStatement
 
 
 fact onlyOneVariableReference {
