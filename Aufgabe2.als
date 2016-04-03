@@ -6,22 +6,35 @@
 //-------------------------------------------------------------------------
 
 sig LinearProgram{
-	function: some Function,
-	mainFunction: one MainFunction
+	functions: some Function,
+	mainFunction: one Function
 }
 
+
 fact {
-	#LinearProgram = 1
+	#LinearProgram = 1 
 }
 
 --------------------------Type---------------------------------------------
 ---------------------------------------------------------------------------
 
 sig Type {
-	isSubTypeOf: lone Type
+	parentType: lone Type
 }
 
-sig Bool extends Type{}
+sig Bool{}
+
+fact notOwnParent { 
+	all t: Type | t.parentType != t 
+}
+
+fact{
+	#Bool = 1
+}
+
+fact noRecursion { 
+	all disj t1, t2: Type | p_subtypeOf[t1, t2] => not p_subtypeOf[t2, t1] 
+}
 
 ----------------------------Function----------------------------------------
 ---------------------------------------------------------------------------
@@ -30,54 +43,65 @@ sig Bool extends Type{}
 sig Function {
 	returnType: one Type, 
 	formalParameters: set FormalParameter,
-	belongsToOneLinPr: one LinearProgram, 
+	owner: one LinearProgram, 
 	sequence: one  LinearSequenceOfStatement
 }
 
-sig MainFunction extends Function{}
-
 
 fact belongsToFunction{
-	all f: Function | all l:LinearProgram | l in f.belongsToOneLinPr <=> f in l.function 
+	all f: Function | all l:LinearProgram | l in f.owner <=> f in l.functions
 }
 
+fact functionsHasOwner {
+ all f: Function | some l: LinearProgram | f in l.functions
+} 
+
 fact mainFunctionHasNoParameter{
-	all m: MainFunction | m.formalParameters = none
+	all m: LinearProgram.mainFunction | m.formalParameters = none
 }
 
 fact mainFunctionBelongsToAFunction{
-	all m: MainFunction | all p: LinearProgram | p.mainFunction = m <=> m.belongsToOneLinPr = p
+	all m: LinearProgram.mainFunction | all p: LinearProgram | p.mainFunction = m => m in p.functions
 }
+
+fact mainFunctionCannotBeCalled {
+ all f: LinearProgram.mainFunction | all e: CallExpression | e.calledFunction != f
+}
+
+
+/*
 
 fact sequenceIsReverseOfBelongsTo{
 	all f: Function | all x: LinearSequenceOfStatement | f.sequence = x <=> x.belongsTo = f
 }
 
+*/
+
+
 fact avoidRecursion{
 	all f: Function| f.*(sequence.statements.expression.calledFunction) != f
 }
-// TODO: Main function cannot be called by a function
 
-
-
--------------------------Parameter-----------------------------------.------
+-------------------------Parameter-----------------------------------------
 ---------------------------------------------------------------------------
 abstract sig Parameter {
 	type: one Type
 }
 
 sig FormalParameter extends Parameter{
-	belongsTo: one Function,
-	belongsToOneVariable: one Variable
+	owner: one Function,
 }
 
 sig ActualParameter extends Parameter {
 	expression: one Expr
 }
 
-
 fact FormalParameter{
-	all f: Function | all p: FormalParameter | f.formalParameters = p <=> p.belongsTo = f
+	all f: Function | all p: FormalParameter | p in f.formalParameters <=> p.owner = f
+}
+
+fact FPHasOwner {
+ all p: FormalParameter | some f: Function | p.owner = f
 }
 
 
@@ -97,7 +121,7 @@ abstract sig Statement {
 	belongsToLinSeq: one LinearSequenceOfStatement 
 }
 
-sig AssignementStatement  extends Statement{
+sig AssignmentStatement  extends Statement{
 	var: one Variable,
 	expressions: one Expr
 }
@@ -105,11 +129,8 @@ sig AssignementStatement  extends Statement{
 sig ReturnStatement extends Statement{}
 
 
------------------------------------------------
-
---fact{#LinearSequenceOfStatement = 1}
-
-fact{#AssignementStatement >1}
+/*
+fact{#AssignmentStatement >1}
 
 
 fact {
@@ -154,12 +175,7 @@ fact noCircle{
 	all disj s1, s2: Statement | s1.nextStatement = s2 => s1 not in s2.^nextStatement
 }
 
-/*
-fact expressionMustAppearInStatement {
-	all e: Expr | some s: Statement | e in s.expression
-}
 
-*/
 
 // FirstStatement doesn't have a predecessor  
 fact firstStatement {
@@ -168,7 +184,7 @@ fact firstStatement {
 
 // ReturnStatement has no NextStatement and the others need to have one
 fact lastStatementReturnstatement{
-	(all r: ReturnStatement | r.nextStatement = none) && (all a: AssignementStatement |# a.nextStatement = 1) && (all v: VarDecl |# v.nextStatement =1)
+	(all r: ReturnStatement | r.nextStatement = none) && (all a: AssignmentStatement |# a.nextStatement = 1) && (all v: VarDecl |# v.nextStatement =1)
 }
 
  // A Statement cannot be NextStatement of itself
@@ -183,9 +199,11 @@ fact differentNextStatement {
 
 // 
 fact{
-	all a: AssignementStatement |  p_subtypeOf [a.variable.type, a.expression.type]
+	all a: AssignmentStatement |  p_subtypeOf [a.variable.type, a.expression.type]
 }
 
+
+*/
 ------------------------------Expression------------------------------------
 ---------------------------------------------------------------------------
 
@@ -212,9 +230,15 @@ fact canNotConsistItself{
 	all e: Expr | (e not in e.^children) && (e != e.parent)
 }
 
+/*
+// ++ mathces Type
+fact MatchesParameters {
+ all e: CallExpression | # e.calledFunction.parameters = # e.parameters
+}*/
+
 
 ---------------------------Expression Tree-----------------------
-sig Node {
+/*sig Node {
 	parent: lone Node,
 	children: set Node,
 	exprTree: one ExpressionTree
@@ -258,8 +282,9 @@ fact parentAndChildHasTheSameExprTree {
 }
 
 
-
--------------------------------Variable-----------------------------------------
+*/
+-------------------------------Variable-------------------------------------
+---------------------------------------------------------------------------
 
 
 sig Variable {
@@ -294,11 +319,14 @@ fact{
 
 // avariable is the reverse of readIn
 fact{
-	all r: VariableReference | all v: Variable | r.avariable = v <=> v.readIn = r
+	all r: VariableReference | all v: Variable | r.avariable = v => r in v.readIn 
 }
 
 
-//----------------------Functions--------------------------------
+
+---------------------------------------------------------------------------
+//----------------------Functions--------------------------------------------
+---------------------------------------------------------------------------
 
 fun p_numFunctionCalls[]: Int {
  # CallExpression
@@ -329,9 +357,9 @@ fun p_parameters [f: Function]: set FormalParameter {
 fun p_subexpr [e: Expr]: set Expr {
  e.children
 }
-
---------- Predicates —------------
-
+---------------------------------------------------------------------------
+------------------------------- Predicates —--------------------------------
+---------------------------------------------------------------------------
 
 pred p_containsCall [f: Function] {
  some x: CallExpression | x in f.sequence.statements.expression
@@ -340,12 +368,13 @@ pred p_containsCall [f: Function] {
 --TODO: Problem: Main Function is called by functions
 
 pred p_isAssigned [v: Variable] {
- some f: Function | some s:AssignementStatement | s in f.sequence.statements && v in s.var
+ some f: Function | some s:AssignmentStatement | s in f.sequence.statements && v in s.var
 }
 
 
+
 pred p_isRead [v: Variable] {
- #(v.readIn)!=0 // TODO + noch nicht getestet
+ #(v.readIn)!=0 
 }
 
 
@@ -358,20 +387,24 @@ pred p_isDeclared [v: Variable] {
 pred p_isParameter[v:Variable]{} // TODO
 
 pred p_subtypeOf [t1: Type, t2: Type] {
- t1 in t2.*isSubTypeOf
+ 	t1 in t2.*parentType
 }
 
 pred p_assignsTo [s: Statement, vd: VarDecl] {
 	vd.variable in s.var
 }
 
-pred show { 
+pred hall{ 
 --	all u: Function | p_containsCall [u] 
 --	all v: Variable |p_isAssigned [v] 
 --	all v: Variable |p_isRead [v]
 --	all v: Variable| p_isDeclared [v] 
+
+--all t1, t2: Type| p_subtypeOf [t1, t2]
+	all s: Statement| all vd: VarDecl |p_assignsTo [s,vd] 
 }
 
+pred show{}
 
-run show
+run show for 5
 
