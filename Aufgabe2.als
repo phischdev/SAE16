@@ -120,7 +120,6 @@ abstract sig Statement {
 
 sig AssignmentStatement  extends Statement{
 	var: one Variable,
-	expressions: one Expr
 }
 
 sig ReturnStatement extends Statement{}
@@ -133,10 +132,20 @@ fact StatementOwnership {
 
 fact StatementHasOwner { all s: Statement | some f: Function | s.owner = f }
 
+fact ReturnStatementTypeMatchFunctionType{
+	all s: ReturnStatement | p_subtypeOf [s.owner.returnType, s.expression.type]
+}
 
 fact ReturnStatementHasExpression { all s: ReturnStatement | s.expression != none }
+
+fact AssignmentStatementHasExpression {
+	all s: AssignmentStatement | s.expression != none 
+}
+
 fact ReturnNoSucessor { all s: ReturnStatement | s.nextStatement = none }
+
 fact StatementsHaveSuccessor { all s: Statement | not s in ReturnStatement =>s.nextStatement != none }
+
 fact NotReflexive { all s: Statement | s.nextStatement != s }
 
 fact StatementNoRecursion {
@@ -156,23 +165,25 @@ fact MinOnePredecessor {
 fact FirstNoPredecessor { all s: Function.firstStatement | all s1: Statement | s1.nextStatement != s }
 
 fact AssignmentTypeMatch{
-	all a: AssignmentStatement |  p_subtypeOf [a.variable.type, a.expression.type]
+	all a: AssignmentStatement |  p_subtypeOf [  a.var.type, a.expression.type]
 }
-
 
 fact FormalParameterCannotBeAssignedTo{
-	all a: AssignmentStatement |all f: FormalParameter| (isTrue[a.var.declared]) && (a.var != f)
+--	all a: AssignmentStatement |not a.var in FormalParameter
 } 
 
-fact OnlyNonDeclaredVariablesCanBeDeclared{
-	all v: VarDecl | isFalse[v.variable.declared]
+fact DeclarationBeforeAssignment {
+	all s: AssignmentStatement | some d: VarDecl | s.var = d.variable => s in d.^nextStatement
 }
 
+fact DeclarationBeforeRead{
+	all v: VariableReference | some d: VarDecl | not v.reference in FormalParameter && v.reference = d.variable => ExpOwnerSt[v] in d.^nextStatement
+}
 
 ------------------------------Expression------------------------------------
 ---------------------------------------------------------------------------
 
-sig Expr {
+abstract sig Expr {
    type: one Type,
    children: set Expr,
    parent: lone Expr,
@@ -185,6 +196,10 @@ sig Literal extends Expr {}
 sig CallExpression extends Expr {
    calledFunction: one Function,
    parameters: set Expr
+}
+
+fun ExpOwnerSt [e:Expr] : Statement {
+	e.owner + (e.^parent).owner
 }
 
 fact ExpressionOwnership {
@@ -220,6 +235,11 @@ fact ParamterTypeMatch {
         # { p: e.calledFunction.parameters | p.type = t } = # { p: e.parameters | p.type = t}
 }
 
+fact CallExpressionMatchFunctionType{
+	all c: CallExpression | c.calledFunction.returnType = c.type
+
+}
+
 -------------------------Parameter-----------------------------------------
 ---------------------------------------------------------------------------
 
@@ -236,11 +256,11 @@ fact FPHasOwner {
 }
 
 fact FormalParameterHasType{
-	all f: FormalParameter | f.type != none
+--	all f: FormalParameter | f.type != none
 }
 
 fact FormalParametersAreDeclaredAndAssigned{
-	all f: FormalParameter | (isTrue[f.declared]) && (isTrue[f.assigned])
+--	all f: FormalParameter | (isTrue[f.declared]) && (isTrue[f.assigned])
 }
 
 -------------------------------Variable-------------------------------------
@@ -248,9 +268,9 @@ fact FormalParametersAreDeclaredAndAssigned{
 
 
 sig Variable {
-	declared: one Bool, 
-	assigned: one Bool, 
-	type: lone Type
+	//declared: one Bool, 
+	//assigned: one Bool, 
+	type: one Type
 }
 
 sig VariableReference extends Expr{
@@ -258,27 +278,54 @@ sig VariableReference extends Expr{
 }
 
 sig VarDecl extends Statement{
-	type: one Type,
+	//type: one Type,
 	variable: one Variable
 } 
 
 
-
-
 // Variable and its VariableReference should have the same type
-fact{
+fact ReferenceVariableTypeMatch{
 	all v: Variable|all r: VariableReference | (r.reference = v => r.type = v.type)
 }
 
 
 
-fact {
-	all v: Variable|all r: VariableReference | (v.type = none) => (not v  in r.reference)
+fact AssignmentRequiresDeclaration {
+--	all v: Variable|all r: VariableReference | isFalse[v.declared]=> (r.reference !=v)
 }
 
-fact {
+fact WithoutAssignmentNoReference{
+	all v: Variable| (not v in FormalParameter &&  some r: VariableReference | r.reference =v)  =>(some s:AssignmentStatement | s.var = v)
+}
+
+fact NeedsDeclarationStatement{
+	all v: Variable | not v in FormalParameter => (some s:VarDecl | s.variable = v) 
+}
+
+fact NoParameterDeclaration{
+	all s: VarDecl | not  s.variable in FormalParameter
+}
+
+fact NeedsAssignmentStatement{
+	all v: Variable | not v in FormalParameter => (some s:AssignmentStatement | v = s.var )
+}
+
+fact NoParameterAssignment{
+	all s:AssignmentStatement | not s.var in FormalParameter
+}
+
+fact DeclaredHasType{
+--	all v: Variable | v.type != none <=> isTrue[v.declared]
+}
+
+fact AssignmentNeedDeclaration{
+--	all v: Variable | isTrue[v.assigned] => isTrue[v.declared]
+}
+
+fact CallExpressionNoRecursion{
 	all c: CallExpression | not c in c.parameters
 }
+
 
 
 fact VarDeclNoExpr { all s: VarDecl | s.expression = none }
@@ -343,13 +390,14 @@ pred p_isParameter[v:Variable]{
 } 
 
 pred p_subtypeOf [t1: Type, t2: Type] {
- 	t1 in t2.*parentType
+ 	t2 in t1.*parentType
 }
 
 pred p_assignsTo [s: Statement, vd: VarDecl] {
 	vd.variable in s.var
 }
 
+/*
 pred test{ 
 	all u: Function | p_containsCall [u] 
 	all v: Variable |p_isAssigned [v] 
@@ -359,7 +407,7 @@ pred test{
 	all t1, t2: Type| p_subtypeOf [t1, t2]
 	all s: Statement| all vd: VarDecl |p_assignsTo [s,vd] 
 }
-
+*/
 
 ---------------------------------------------------------------------------
 -------------------------------Show----------------------------------------
@@ -405,13 +453,27 @@ run task3 for 4
 // Doesn't work
 */
 
+/*
 pred task4{
-	all a: AssignmentStatement | all c: CallExpression | 
-	(c in a.expressions) && 
-	(c.calledFunction.returnType != c.calledFunction.lastStatement.type ) &&
-	(a.expressions.type != c.calledFunction.returnType)
+	#AssignmentStatement =1
+	#CallExpression =1
+	#Variable = 1
+	all a: AssignmentStatement | some c: CallExpression | 
+	(c = a.expression) && 
+	(a.var.type != c.type) && // VariableType not CallExpressionType
+	(c.calledFunction.returnType != c.calledFunction.lastStatement.expression.type) 
 
 }
 
 run task4 for 4
+*/
 
+pred task5{
+	#Literal = 1
+	#Type = 2
+	
+	all disj t1, t2: Type | not p_subtypeOf [t1, t2] && not p_subtypeOf [t2, t1]
+
+}
+
+run task5 for 2

@@ -1,0 +1,256 @@
+<alloy builddate="2012-09-25 15:54 EDT">
+
+<instance bitwidth="0" maxseq="0" command="Run task4 for 4" filename="/Users/panuyabalasuntharam/Documents/SAE16/Aufgabe2.als">
+
+<sig label="seq/Int" ID="0" parentID="1" builtin="yes">
+</sig>
+
+<sig label="Int" ID="1" parentID="2" builtin="yes">
+</sig>
+
+<sig label="String" ID="3" parentID="2" builtin="yes">
+</sig>
+
+<sig label="this/True" ID="4" parentID="5" one="yes">
+   <atom label="True$0"/>
+</sig>
+
+<sig label="this/False" ID="6" parentID="5" one="yes">
+   <atom label="False$0"/>
+</sig>
+
+<sig label="this/Bool" ID="5" parentID="2" abstract="yes">
+</sig>
+
+<sig label="this/LinearProgram" ID="7" parentID="2">
+   <atom label="LinearProgram$0"/>
+</sig>
+
+<field label="functions" ID="8" parentID="7">
+   <tuple> <atom label="LinearProgram$0"/> <atom label="Function$0"/> </tuple>
+   <tuple> <atom label="LinearProgram$0"/> <atom label="Function$1"/> </tuple>
+   <types> <type ID="7"/> <type ID="9"/> </types>
+</field>
+
+<field label="mainFunction" ID="10" parentID="7">
+   <tuple> <atom label="LinearProgram$0"/> <atom label="Function$0"/> </tuple>
+   <types> <type ID="7"/> <type ID="9"/> </types>
+</field>
+
+<sig label="this/Type" ID="11" parentID="2">
+   <atom label="Type$0"/>
+   <atom label="Type$1"/>
+   <atom label="Type$2"/>
+</sig>
+
+<field label="parentType" ID="12" parentID="11">
+   <tuple> <atom label="Type$0"/> <atom label="Type$1"/> </tuple>
+   <tuple> <atom label="Type$2"/> <atom label="Type$0"/> </tuple>
+   <types> <type ID="11"/> <type ID="11"/> </types>
+</field>
+
+<sig label="this/Function" ID="9" parentID="2">
+   <atom label="Function$0"/>
+   <atom label="Function$1"/>
+</sig>
+
+<field label="returnType" ID="13" parentID="9">
+   <tuple> <atom label="Function$0"/> <atom label="Type$2"/> </tuple>
+   <tuple> <atom label="Function$1"/> <atom label="Type$0"/> </tuple>
+   <types> <type ID="9"/> <type ID="11"/> </types>
+</field>
+
+<field label="parameters" ID="14" parentID="9">
+   <types> <type ID="9"/> <type ID="15"/> </types>
+</field>
+
+<field label="owner" ID="16" parentID="9">
+   <tuple> <atom label="Function$0"/> <atom label="LinearProgram$0"/> </tuple>
+   <tuple> <atom label="Function$1"/> <atom label="LinearProgram$0"/> </tuple>
+   <types> <type ID="9"/> <type ID="7"/> </types>
+</field>
+
+<field label="firstStatement" ID="17" parentID="9">
+   <tuple> <atom label="Function$0"/> <atom label="AssignmentStatement$0"/> </tuple>
+   <tuple> <atom label="Function$1"/> <atom label="VarDecl$0"/> </tuple>
+   <types> <type ID="9"/> <type ID="18"/> </types>
+</field>
+
+<field label="lastStatement" ID="19" parentID="9">
+   <tuple> <atom label="Function$0"/> <atom label="ReturnStatement$1"/> </tuple>
+   <tuple> <atom label="Function$1"/> <atom label="ReturnStatement$0"/> </tuple>
+   <types> <type ID="9"/> <type ID="20"/> </types>
+</field>
+
+<sig label="this/AssignmentStatement" ID="21" parentID="18">
+   <atom label="AssignmentStatement$0"/>
+</sig>
+
+<field label="var" ID="22" parentID="21">
+   <tuple> <atom label="AssignmentStatement$0"/> <atom label="Variable$0"/> </tuple>
+   <types> <type ID="21"/> <type ID="23"/> </types>
+</field>
+
+<sig label="this/ReturnStatement" ID="20" parentID="18">
+   <atom label="ReturnStatement$0"/>
+   <atom label="ReturnStatement$1"/>
+</sig>
+
+<sig label="this/VarDecl" ID="24" parentID="18">
+   <atom label="VarDecl$0"/>
+</sig>
+
+<field label="variable" ID="25" parentID="24">
+   <tuple> <atom label="VarDecl$0"/> <atom label="Variable$0"/> </tuple>
+   <types> <type ID="24"/> <type ID="23"/> </types>
+</field>
+
+<sig label="this/Statement" ID="18" parentID="2" abstract="yes">
+</sig>
+
+<field label="nextStatement" ID="26" parentID="18">
+   <tuple> <atom label="VarDecl$0"/> <atom label="ReturnStatement$0"/> </tuple>
+   <tuple> <atom label="AssignmentStatement$0"/> <atom label="ReturnStatement$1"/> </tuple>
+   <types> <type ID="18"/> <type ID="18"/> </types>
+</field>
+
+<field label="expression" ID="27" parentID="18">
+   <tuple> <atom label="ReturnStatement$0"/> <atom label="Literal$1"/> </tuple>
+   <tuple> <atom label="ReturnStatement$1"/> <atom label="Expr$0"/> </tuple>
+   <tuple> <atom label="AssignmentStatement$0"/> <atom label="CallExpression$0"/> </tuple>
+   <types> <type ID="18"/> <type ID="28"/> </types>
+</field>
+
+<field label="owner" ID="29" parentID="18">
+   <tuple> <atom label="VarDecl$0"/> <atom label="Function$1"/> </tuple>
+   <tuple> <atom label="ReturnStatement$0"/> <atom label="Function$1"/> </tuple>
+   <tuple> <atom label="ReturnStatement$1"/> <atom label="Function$0"/> </tuple>
+   <tuple> <atom label="AssignmentStatement$0"/> <atom label="Function$0"/> </tuple>
+   <types> <type ID="18"/> <type ID="9"/> </types>
+</field>
+
+<sig label="this/Literal" ID="30" parentID="28">
+   <atom label="Literal$0"/>
+   <atom label="Literal$1"/>
+</sig>
+
+<sig label="this/CallExpression" ID="31" parentID="28">
+   <atom label="CallExpression$0"/>
+</sig>
+
+<field label="calledFunction" ID="32" parentID="31">
+   <tuple> <atom label="CallExpression$0"/> <atom label="Function$1"/> </tuple>
+   <types> <type ID="31"/> <type ID="9"/> </types>
+</field>
+
+<field label="parameters" ID="33" parentID="31">
+   <types> <type ID="31"/> <type ID="28"/> </types>
+</field>
+
+<sig label="this/VariableReference" ID="34" parentID="28">
+</sig>
+
+<field label="reference" ID="35" parentID="34">
+   <types> <type ID="34"/> <type ID="23"/> </types>
+</field>
+
+<sig label="this/Expr" ID="28" parentID="2">
+   <atom label="Expr$0"/>
+</sig>
+
+<field label="type" ID="36" parentID="28">
+   <tuple> <atom label="Literal$0"/> <atom label="Type$2"/> </tuple>
+   <tuple> <atom label="Expr$0"/> <atom label="Type$1"/> </tuple>
+   <tuple> <atom label="Literal$1"/> <atom label="Type$1"/> </tuple>
+   <tuple> <atom label="CallExpression$0"/> <atom label="Type$0"/> </tuple>
+   <types> <type ID="28"/> <type ID="11"/> </types>
+</field>
+
+<field label="children" ID="37" parentID="28">
+   <tuple> <atom label="CallExpression$0"/> <atom label="Literal$0"/> </tuple>
+   <types> <type ID="28"/> <type ID="28"/> </types>
+</field>
+
+<field label="parent" ID="38" parentID="28">
+   <tuple> <atom label="Literal$0"/> <atom label="CallExpression$0"/> </tuple>
+   <types> <type ID="28"/> <type ID="28"/> </types>
+</field>
+
+<field label="owner" ID="39" parentID="28">
+   <tuple> <atom label="Expr$0"/> <atom label="ReturnStatement$1"/> </tuple>
+   <tuple> <atom label="Literal$1"/> <atom label="ReturnStatement$0"/> </tuple>
+   <tuple> <atom label="CallExpression$0"/> <atom label="AssignmentStatement$0"/> </tuple>
+   <types> <type ID="28"/> <type ID="18"/> </types>
+</field>
+
+<field label="isParameter" ID="40" parentID="28">
+   <tuple> <atom label="Literal$0"/> <atom label="False$0"/> </tuple>
+   <tuple> <atom label="Expr$0"/> <atom label="False$0"/> </tuple>
+   <tuple> <atom label="Literal$1"/> <atom label="False$0"/> </tuple>
+   <tuple> <atom label="CallExpression$0"/> <atom label="False$0"/> </tuple>
+   <types> <type ID="28"/> <type ID="5"/> </types>
+</field>
+
+<sig label="this/FormalParameter" ID="15" parentID="23">
+</sig>
+
+<field label="owner" ID="41" parentID="15">
+   <types> <type ID="15"/> <type ID="9"/> </types>
+</field>
+
+<sig label="this/Variable" ID="23" parentID="2">
+   <atom label="Variable$0"/>
+</sig>
+
+<field label="declared" ID="42" parentID="23">
+   <tuple> <atom label="Variable$0"/> <atom label="False$0"/> </tuple>
+   <types> <type ID="23"/> <type ID="5"/> </types>
+</field>
+
+<field label="type" ID="43" parentID="23">
+   <tuple> <atom label="Variable$0"/> <atom label="Type$2"/> </tuple>
+   <types> <type ID="23"/> <type ID="11"/> </types>
+</field>
+
+<sig label="univ" ID="2" builtin="yes">
+</sig>
+
+<skolem label="$task4_l" ID="44">
+   <tuple> <atom label="Function$0"/> <atom label="LinearProgram$0"/> </tuple>
+   <tuple> <atom label="Function$1"/> <atom label="LinearProgram$0"/> </tuple>
+   <types> <type ID="9"/> <type ID="7"/> </types>
+</skolem>
+
+<skolem label="$task4_f" ID="45">
+   <tuple> <atom label="VarDecl$0"/> <atom label="Function$1"/> </tuple>
+   <tuple> <atom label="ReturnStatement$0"/> <atom label="Function$1"/> </tuple>
+   <tuple> <atom label="ReturnStatement$1"/> <atom label="Function$0"/> </tuple>
+   <tuple> <atom label="AssignmentStatement$0"/> <atom label="Function$0"/> </tuple>
+   <types> <type ID="18"/> <type ID="9"/> </types>
+</skolem>
+
+<skolem label="$task4_c" ID="47">
+   <tuple> <atom label="AssignmentStatement$0"/> <atom label="CallExpression$0"/> </tuple>
+   <types> <type ID="21"/> <type ID="31"/> </types>
+</skolem>
+
+<skolem label="$this/p_expressionTypes" ID="m1">
+   <tuple> <atom label="Type$0"/> </tuple>
+   <tuple> <atom label="Type$1"/> </tuple>
+   <tuple> <atom label="Type$2"/> </tuple>
+   <types> <type ID="11"/> </types>
+</skolem>
+
+<skolem label="$this/p_literalTypes" ID="m2">
+   <tuple> <atom label="Type$1"/> </tuple>
+   <tuple> <atom label="Type$2"/> </tuple>
+   <types> <type ID="11"/> </types>
+</skolem>
+
+</instance>
+
+<source filename="/Users/panuyabalasuntharam/Documents/SAE16/Aufgabe2.als" content="//------------------Project 1------------------------------------------------&#x000a;//-------------------------------------------------------------------------&#x000a;//------------Philipp Schimmelfennig -Panuya Balasuntharam----------------------&#x000a;//-------------------------------------------------------------------------&#x000a;&#x000a;&#x000a;// Boolean&#x000a;abstract sig Bool {}&#x000a;one sig True, False extends Bool {}&#x000a;&#x000a;pred isTrue[b: Bool] { b in True }&#x000a;&#x000a;pred isFalse[b: Bool] { b in False }&#x000a;&#x000a;fun Not[b: Bool] : Bool {&#x000a; Bool - b&#x000a;}&#x000a;&#x000a;fun And[b1, b2: Bool] : Bool {&#x000a; subset_[b1 + b2, True]&#x000a;}&#x000a;&#x000a;fun Or[b1, b2: Bool] : Bool {&#x000a; subset_[True, b1 + b2]&#x000a;}&#x000a;&#x000a;fun Xor[b1, b2: Bool] : Bool {&#x000a; subset_[Bool, b1 + b2]&#x000a;}&#x000a;&#x000a;fun Nand[b1, b2: Bool] : Bool {&#x000a; subset_[False, b1 + b2]&#x000a;}&#x000a;&#x000a;fun Nor[b1, b2: Bool] : Bool {&#x000a; subset_[b1 + b2, False]&#x000a;}&#x000a;&#x000a;fun subset_[s1, s2: set Bool] : Bool {&#x000a; (s1 in s2) =&gt; True else False&#x000a;}&#x000a;&#x000a;--------------------------------------------------------------------------&#x000a;&#x000a;&#x000a;sig LinearProgram{&#x000a;&#x0009;functions: some Function,&#x000a;&#x0009;mainFunction: one Function&#x000a;}&#x000a;&#x000a;&#x000a;fact {&#x000a;&#x0009;#LinearProgram = 1&#x000a;}&#x000a;&#x000a;--------------------------Type---------------------------------------------&#x000a;---------------------------------------------------------------------------&#x000a;&#x000a;sig Type {&#x000a;&#x0009;parentType: lone Type&#x000a;}&#x000a;&#x000a;fact notOwnParent { &#x000a;&#x0009;all t: Type | t.parentType != t &#x000a;}&#x000a;&#x000a;fact noRecursion { &#x000a;&#x0009;all disj t1, t2: Type | p_subtypeOf[t1, t2] =&gt; not p_subtypeOf[t2, t1] &#x000a;}&#x000a;&#x000a;----------------------------Function----------------------------------------&#x000a;---------------------------------------------------------------------------&#x000a;&#x000a;&#x000a;sig Function {&#x000a;&#x0009;returnType: one Type, &#x000a;&#x0009;parameters: set FormalParameter,&#x000a;&#x0009;owner: one LinearProgram, &#x000a;&#x0009;firstStatement: one Statement,&#x000a;&#x0009;lastStatement: one ReturnStatement,&#x000a;}&#x000a;&#x000a;fact belongsToFunction{&#x000a;&#x0009;all f: Function | all l:LinearProgram | l in f.owner &lt;=&gt; f in l.functions&#x000a;}&#x000a;&#x000a;fact functionsHasOwner {&#x000a;&#x0009;all f: Function | some l: LinearProgram | f in l.functions&#x000a;} &#x000a;&#x000a;fact mainFunctionHasNoParameter{&#x000a;&#x0009;all m: LinearProgram.mainFunction | m.parameters= none&#x000a;}&#x000a;&#x000a;fact mainFunctionBelongsToAFunction{&#x000a;&#x0009;all m: LinearProgram.mainFunction | all p: LinearProgram | p.mainFunction = m =&gt; m in p.functions&#x000a;}&#x000a;&#x000a;fact mainFunctionCannotBeCalled {&#x000a;&#x0009;all f: LinearProgram.mainFunction | all e: CallExpression | e.calledFunction != f&#x000a;}&#x000a;&#x000a;fact avoidRecursion{&#x000a;&#x0009;all f: Function|not f in f.^((firstStatement.*nextStatement).expression.calledFunction)&#x000a;}&#x000a;&#x000a;fact LastStatemenInList { &#x000a;&#x0009;all f: Function | f.lastStatement in f.firstStatement.*nextStatement &#x000a;}&#x000a;&#x000a;&#x000a;--------------------------Statement-----------------------------------------&#x000a;---------------------------------------------------------------------------&#x000a;&#x000a;abstract sig Statement {&#x000a;&#x0009;nextStatement: lone Statement,&#x000a;&#x0009;expression: lone Expr,&#x000a;&#x0009;owner: one Function &#x000a;}&#x000a;&#x000a;sig AssignmentStatement  extends Statement{&#x000a;&#x0009;var: one Variable,&#x000a;}&#x000a;&#x000a;sig ReturnStatement extends Statement{}&#x000a;&#x000a;&#x000a;fact StatementOwnership {&#x000a;&#x0009;all f: Function | all s: Statement | s in f.firstStatement.*nextStatement &lt;=&gt; s.owner = f&#x000a;}&#x000a;&#x000a;&#x000a;fact StatementHasOwner { all s: Statement | some f: Function | s.owner = f }&#x000a;&#x000a;fact ReturnStatementTypeMatchFunctionType{&#x000a;&#x0009;all s: ReturnStatement | p_subtypeOf [s.owner.returnType, s.expression.type]&#x000a;}&#x000a;&#x000a;fact ReturnStatementHasExpression { all s: ReturnStatement | s.expression != none }&#x000a;&#x000a;fact AssignmentStatementHasExpression {&#x000a;&#x0009;all s: AssignmentStatement | s.expression != none &#x000a;}&#x000a;&#x000a;fact ReturnNoSucessor { all s: ReturnStatement | s.nextStatement = none }&#x000a;&#x000a;fact StatementsHaveSuccessor { all s: Statement | not s in ReturnStatement =&gt;s.nextStatement != none }&#x000a;&#x000a;fact NotReflexive { all s: Statement | s.nextStatement != s }&#x000a;&#x000a;fact StatementNoRecursion {&#x000a;&#x0009;all disj s1, s2: Statement | s1.nextStatement = s2 =&gt;not s1 in s2.^nextStatement&#x000a;}&#x000a;&#x000a;fact MaxOnePredecessor {&#x000a;&#x0009;all s: Statement | # {s1: Statement | s1.nextStatement = s} &lt;= 1&#x000a;&#x000a;}&#x000a;&#x000a;fact MinOnePredecessor {&#x000a;&#x0009;all s: Statement | not s  in Function.firstStatement =&gt; some s1: Statement | s1.nextStatement = s&#x000a;}&#x000a;&#x000a;&#x000a;fact FirstNoPredecessor { all s: Function.firstStatement | all s1: Statement | s1.nextStatement != s }&#x000a;&#x000a;fact AssignmentTypeMatch{&#x000a;&#x0009;all a: AssignmentStatement |  p_subtypeOf [  a.var.type, a.expression.type]&#x000a;}&#x000a;&#x000a;fact FormalParameterCannotBeAssignedTo{&#x000a;--&#x0009;all a: AssignmentStatement |not a.var in FormalParameter&#x000a;} &#x000a;&#x000a;&#x000a;&#x000a;------------------------------Expression------------------------------------&#x000a;---------------------------------------------------------------------------&#x000a;&#x000a;sig Expr {&#x000a;   type: one Type,&#x000a;   children: set Expr,&#x000a;   parent: lone Expr,&#x000a;   owner: lone Statement,&#x000a;   isParameter: one Bool&#x000a;}&#x000a;&#x000a;sig Literal extends Expr {}&#x000a;&#x000a;sig CallExpression extends Expr {&#x000a;   calledFunction: one Function,&#x000a;   parameters: set Expr&#x000a;}&#x000a;&#x000a;fact ExpressionOwnership {&#x000a;   all e: Expr | all s: Statement | e.owner = s &lt;=&gt; s.expression = e&#x000a;}&#x000a;&#x000a;fact HasParentOrOwner {&#x000a;   all e: Expr | isFalse [e.isParameter] =&gt;( e.owner = none &lt;=&gt; e.parent != none )&#x000a;}&#x000a;&#x000a;fact ExprAsParameterNoOwnerNorParent {&#x000a;   all e: Expr | isTrue [e.isParameter] =&gt; e.owner = none &amp;&amp; e.parent = none&#x000a;}&#x000a;&#x000a;fact IsParameterFact {&#x000a;   all e: Expr | isTrue [e.isParameter] &lt;=&gt; some c: CallExpression | e in c.parameters&#x000a;}&#x000a;&#x000a;fact noExprRecursion{&#x000a;   all e: Expr | (not e in e.^children) &amp;&amp; (e != e.parent)&#x000a;}&#x000a;&#x000a;fact LiteralNoChildren {&#x000a;   all e: Expr | all l: Literal | e.parent != l&#x000a;}&#x000a;&#x000a;fact ParentsMatchChildren {&#x000a; all e1, e2: Expr | e2 in e1.children &lt;=&gt; e2.parent = e1&#x000a;}&#x000a;&#x000a;fact ParamterTypeMatch {&#x000a;    all e: CallExpression | all t: e.calledFunction.parameters.type |&#x000a;        # { p: e.calledFunction.parameters | p.type = t } = # { p: e.parameters | p.type = t}&#x000a;}&#x000a;&#x000a;fact CallExpressionMatchFunctionType{&#x000a;&#x0009;all c: CallExpression | c.calledFunction.returnType = c.type&#x000a;&#x000a;}&#x000a;&#x000a;-------------------------Parameter-----------------------------------------&#x000a;---------------------------------------------------------------------------&#x000a;&#x000a;sig FormalParameter extends Variable{&#x000a;&#x0009;owner: one Function&#x000a;}&#x000a;&#x000a;fact FormalParameter{&#x000a;&#x0009;all f: Function | all p: FormalParameter | p in f.parameters &lt;=&gt; p.owner = f&#x000a;}&#x000a;&#x000a;fact FPHasOwner {&#x000a; all p: FormalParameter | some f: Function | p.owner = f&#x000a;}&#x000a;&#x000a;fact FormalParameterHasType{&#x000a;--&#x0009;all f: FormalParameter | f.type != none&#x000a;}&#x000a;&#x000a;fact FormalParametersAreDeclaredAndAssigned{&#x000a;--&#x0009;all f: FormalParameter | (isTrue[f.declared]) &amp;&amp; (isTrue[f.assigned])&#x000a;}&#x000a;&#x000a;-------------------------------Variable-------------------------------------&#x000a;---------------------------------------------------------------------------&#x000a;&#x000a;&#x000a;sig Variable {&#x000a;&#x0009;declared: one Bool, &#x000a;&#x0009;//assigned: one Bool, &#x000a;&#x0009;type: one Type&#x000a;}&#x000a;&#x000a;sig VariableReference extends Expr{&#x000a;&#x0009;reference: one Variable&#x000a;}&#x000a;&#x000a;sig VarDecl extends Statement{&#x000a;&#x0009;//type: one Type,&#x000a;&#x0009;variable: one Variable&#x000a;} &#x000a;&#x000a;&#x000a;&#x000a;&#x000a;// Variable and its VariableReference should have the same type&#x000a;fact ReferenceVariableTypeMatch{&#x000a;&#x0009;all v: Variable|all r: VariableReference | (r.reference = v =&gt; r.type = v.type)&#x000a;}&#x000a;&#x000a;&#x000a;&#x000a;fact AssignmentRequiresDeclaration {&#x000a;--&#x0009;all v: Variable|all r: VariableReference | isFalse[v.declared]=&gt; (r.reference !=v)&#x000a;}&#x000a;&#x000a;fact WithoutAssignmentNoReference{&#x000a;&#x0009;all v: Variable| (not v in FormalParameter &amp;&amp;  some r: VariableReference | r.reference =v)  =&gt;(some s:AssignmentStatement | s.var = v)&#x000a;}&#x000a;&#x000a;fact NeedsDeclarationStatement{&#x000a;&#x0009;all v: Variable | not v in FormalParameter =&gt; (some s:VarDecl | s.variable = v) &#x000a;}&#x000a;&#x000a;fact NoParameterDeclaration{&#x000a;&#x0009;all s: VarDecl | not  s.variable in FormalParameter&#x000a;}&#x000a;&#x000a;fact NeedsAssignmentStatement{&#x000a;&#x0009;all v: Variable | not v in FormalParameter =&gt; (some s:AssignmentStatement | v = s.var )&#x000a;}&#x000a;&#x000a;fact NoParameterAssignment{&#x000a;&#x0009;all s:AssignmentStatement | not s.var in FormalParameter&#x000a;}&#x000a;&#x000a;fact DeclaredHasType{&#x000a;--&#x0009;all v: Variable | v.type != none &lt;=&gt; isTrue[v.declared]&#x000a;}&#x000a;&#x000a;fact AssignmentNeedDeclaration{&#x000a;--&#x0009;all v: Variable | isTrue[v.assigned] =&gt; isTrue[v.declared]&#x000a;}&#x000a;&#x000a;fact CallExpressionNoRecursion{&#x000a;&#x0009;all c: CallExpression | not c in c.parameters&#x000a;}&#x000a;&#x000a;&#x000a;&#x000a;fact VarDeclNoExpr { all s: VarDecl | s.expression = none }&#x000a;&#x000a;&#x000a;---------------------------------------------------------------------------&#x000a;//----------------------Functions------------------------------------------&#x000a;-------------------------------------------------------------------------&#x000a;&#x000a;fun p_numFunctionCalls[]: Int {&#x000a; # CallExpression&#x000a;}&#x000a;&#x000a;fun p_expressionTypes[]:set Type {&#x000a; Expr.type&#x000a;}&#x000a;&#x000a;fun p_literalTypes[]:set Type {&#x000a; Literal.type&#x000a;}&#x000a;&#x000a;fun p_statementsInFunction [f: Function]: set Statement {&#x000a; f.firstStatement.*nextStatement&#x000a;}&#x000a;&#x000a;fun p_statementsAfter [s: Statement]: set Statement {&#x000a; s.^nextStatement&#x000a;}&#x000a;&#x000a;fun p_parameters [f: Function]: set FormalParameter {&#x000a; f.parameters&#x000a;}&#x000a;&#x000a;fun p_subexpr [e: Expr]: set Expr {&#x000a; e.children&#x000a;}&#x000a;&#x000a;&#x000a;---------------------------------------------------------------------------&#x000a;------------------------------- Predicates &#x2014;--------------------------------&#x000a;---------------------------------------------------------------------------&#x000a;&#x000a;pred p_containsCall [f: Function] {&#x000a; some x: CallExpression | x in f.*firstStatement.expression&#x000a;}&#x000a;&#x000a;pred p_isAssigned [v: Variable] {&#x000a; some f: Function | some s:AssignmentStatement | s in f.*firstStatement &amp;&amp; v in s.var&#x000a;}&#x000a;&#x000a;pred p_isRead [v: Variable] {&#x000a;&#x0009;some r: VariableReference | v in r.reference&#x000a;}&#x000a;&#x000a;&#x000a;pred p_isDeclared [v: Variable] {&#x000a; &#x0009;some f: Function | some s: VarDecl | s in f.*firstStatement &amp;&amp; v in s.variable&#x000a;}&#x000a;&#x000a;pred p_isParameter[v:Variable]{&#x000a;&#x0009;some f: Function | v in f.parameters&#x000a;} &#x000a;&#x000a;pred p_subtypeOf [t1: Type, t2: Type] {&#x000a; &#x0009;t2 in t1.*parentType&#x000a;}&#x000a;&#x000a;pred p_assignsTo [s: Statement, vd: VarDecl] {&#x000a;&#x0009;vd.variable in s.var&#x000a;}&#x000a;&#x000a;/*&#x000a;pred test{ &#x000a;&#x0009;all u: Function | p_containsCall [u] &#x000a;&#x0009;all v: Variable |p_isAssigned [v] &#x000a;&#x0009;all v: Variable |p_isRead [v]&#x000a;&#x0009;all v: Variable| p_isDeclared [v] &#x000a;&#x000a;&#x0009;all t1, t2: Type| p_subtypeOf [t1, t2]&#x000a;&#x0009;all s: Statement| all vd: VarDecl |p_assignsTo [s,vd] &#x000a;}&#x000a;*/&#x000a;&#x000a;---------------------------------------------------------------------------&#x000a;-------------------------------Show----------------------------------------&#x000a;---------------------------------------------------------------------------&#x000a;//pred show{}&#x000a;//run show for 10&#x000a;&#x000a;&#x000a;---------------------------------------------------------------------------&#x000a;--------------------------------Task C-------------------------------------&#x000a;&#x000a;/*&#x000a;pred task1 {&#x000a;&#x0009;#Function = 1 &#x000a;&#x0009;#CallExpression = 2&#x000a;}&#x000a;&#x000a;run task1 for 4 &#x000a;&#x000a;//Doesn&apos;t work&#x000a;&#x000a;&#x000a;pred task2 {&#x000a;&#x0009;#Function = 2 &#x000a;&#x0009;#CallExpression = 2&#x000a;}&#x000a;&#x000a;&#x000a;run task2 for 4 */&#x000a;&#x000a;//Doesn&apos;t work&#x000a;&#x000a;/*&#x000a;pred task3 {&#x000a;&#x0009;#AssignmentStatement =1&#x000a;&#x0009;#Variable = 1&#x000a;&#x0009;#Literal = 1&#x000a;}&#x000a;&#x000a;&#x000a;run task3 for 4&#x000a;&#x000a;// Doesn&apos;t work&#x000a;*/&#x000a;&#x000a;pred task4{&#x000a;&#x0009;#AssignmentStatement =1&#x000a;&#x0009;#CallExpression =1&#x000a;&#x0009;#Variable = 1&#x000a;&#x0009;all a: AssignmentStatement | some c: CallExpression | &#x000a;&#x0009;(c = a.expression) &amp;&amp; &#x000a;&#x0009;(a.var.type != c.type) &amp;&amp; // VariableType not CallExpressionType&#x000a;&#x0009;(c.calledFunction.returnType != c.calledFunction.lastStatement.expression.type) &#x000a;&#x000a;}&#x000a;&#x000a;run task4 for 4&#x000a;&#x000a;"/>
+
+<source filename="/$alloy4$/models/util/integer.als" content="module util/integer&#x000a;&#x000a;/*&#x000a; * A collection of utility functions for using Integers in Alloy.&#x000a; * Note that integer overflows are silently truncated to the current bitwidth&#x000a; * using the 2&apos;s complement arithmetic, unless the &quot;forbid overfows&quot; option is&#x000a; * turned on, in which case only models that don&apos;t have any overflows are &#x000a; * analyzed. &#x000a; */&#x000a;&#x000a;fun add  [n1, n2: Int] : Int { this/plus[n1, n2] }&#x000a;fun plus [n1, n2: Int] : Int { n1 fun/add n2 }&#x000a;&#x000a;fun sub   [n1, n2: Int] : Int { this/minus[n1, n2] }&#x000a;fun minus [n1, n2: Int] : Int { n1 fun/sub n2 }&#x000a;&#x000a;fun mul [n1, n2: Int] : Int { n1 fun/mul n2 }&#x000a;&#x000a;/**&#x000a; * Performs the division with &quot;round to zero&quot; semantics, except the following 3 cases&#x000a; * 1) if a is 0, then it returns 0&#x000a; * 2) else if b is 0, then it returns 1 if a is negative and -1 if a is positive&#x000a; * 3) else if a is the smallest negative integer, and b is -1, then it returns a&#x000a; */&#x000a;fun div [n1, n2: Int] : Int { n1 fun/div n2 }&#x000a;&#x000a;/** answer is defined to be the unique integer that satisfies &quot;a = ((a/b)*b) + remainder&quot; */&#x000a;fun rem [n1, n2: Int] : Int { n1 fun/rem n2 }&#x000a;&#x000a;/** negate */&#x000a;fun negate [n: Int] : Int { 0 fun/sub n }&#x000a;&#x000a;/** equal to */&#x000a;pred eq [n1, n2: Int] { int[n1] = int[n2] }&#x000a;&#x000a;/** greater than */&#x000a;pred gt [n1, n2: Int] { n1 &gt; n2 }&#x000a;&#x000a;/** less then */&#x000a;pred lt [n1, n2: Int] { n1 &lt; n2 }&#x000a;&#x000a;/** greater than or equal */&#x000a;pred gte [n1, n2: Int] { n1 &gt;= n2 }&#x000a;&#x000a;/** less than or equal */&#x000a;pred lte [n1, n2: Int] { n1 &lt;= n2 }&#x000a;&#x000a;/** integer is zero */&#x000a;pred zero [n: Int] { n = 0 }&#x000a;&#x000a;/** positive */&#x000a;pred pos  [n: Int] { n &gt; 0 }&#x000a;&#x000a;/** negative */&#x000a;pred neg  [n: Int] { n &lt; 0 }&#x000a;&#x000a;/** non-positive */&#x000a;pred nonpos [n: Int] { n &lt;= 0 }&#x000a;&#x000a;/** non-negative */&#x000a;pred nonneg [n: Int] { n &gt;= 0 }&#x000a;&#x000a;/** signum (aka sign or sgn) */&#x000a;fun signum [n: Int] : Int { n&lt;0 =&gt; (0 fun/sub 1) else (n&gt;0 =&gt; 1 else 0) }&#x000a;&#x000a;/**&#x000a; * returns the ith element (zero-based) from the set s&#x000a; * in the ordering of &apos;next&apos;, which is a linear ordering&#x000a; * relation like that provided by util/ordering&#x000a; */&#x000a;fun int2elem[i: Int, next: univ-&gt;univ, s: set univ] : lone s {&#x000a;  {e: s | #^next.e = int i }&#x000a;}&#x000a;&#x000a;/**&#x000a; * returns the index of the element (zero-based) in the&#x000a; * ordering of next, which is a linear ordering relation&#x000a; * like that provided by util/ordering&#x000a; */&#x000a;fun elem2int[e: univ, next: univ-&gt;univ] : lone Int {&#x000a;  Int[#^next.e]&#x000a;}&#x000a;&#x000a;/** returns the largest integer in the current bitwidth */&#x000a;fun max:one Int { fun/max }&#x000a;&#x000a;/** returns the smallest integer in the current bitwidth */&#x000a;fun min:one Int { fun/min }&#x000a;&#x000a;/** maps each integer (except max) to the integer after it */&#x000a;fun next:Int-&gt;Int { fun/next }&#x000a;&#x000a;/** maps each integer (except min) to the integer before it */&#x000a;fun prev:Int-&gt;Int { ~next }&#x000a;&#x000a;/** given a set of integers, return the largest element */&#x000a;fun max [es: set Int]: lone Int { es - es.^prev }&#x000a;&#x000a;/** given a set of integers, return the smallest element */&#x000a;fun min [es: set Int]: lone Int { es - es.^next }&#x000a;&#x000a;/** given an integer, return all integers prior to it */&#x000a;fun prevs [e: Int]: set Int { e.^prev }&#x000a;&#x000a;/** given an integer, return all integers following it */&#x000a;fun nexts [e: Int]: set Int { e.^next }&#x000a;&#x000a;/** returns the larger of the two integers */&#x000a;fun larger [e1, e2: Int]: Int { let a=int[e1], b=int[e2] | (a&lt;b =&gt; b else a) }&#x000a;&#x000a;/** returns the smaller of the two integers */&#x000a;fun smaller [e1, e2: Int]: Int { let a=int[e1], b=int[e2] | (a&lt;b =&gt; a else b) }&#x000a;"/>
+
+</alloy>
